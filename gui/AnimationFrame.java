@@ -237,12 +237,10 @@ public class AnimationFrame extends JFrame {
 		if (isPaused) {
 			isPaused = false;
 			this.btnPauseRun.setText("||");
-			((ExcitableSprite)this.player1).setIsEnergetic(true);
 		}
 		else {
 			isPaused = true;
 			this.btnPauseRun.setText(">");
-			((ExcitableSprite)this.player1).setIsEnergetic(false);
 		}
 	}
 
