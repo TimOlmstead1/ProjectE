@@ -8,6 +8,8 @@ public interface Universe {
 
 	public double getScale();
 
+	public ArrayList<DisplayableSprite> getBarriers();
+	public ArrayList<DisplayableSprite> getOneWayBarriers();
 
 	public double getXCenter();
 	public double getYCenter();
@@ -19,6 +21,7 @@ public interface Universe {
 	public void setComplete(boolean complete);
 	
 	public Background getBackground();
+	public Background getForeground();
 	public DisplayableSprite getPlayer1();
 	public boolean centerOnPlayer();
 

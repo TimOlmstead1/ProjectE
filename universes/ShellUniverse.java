@@ -4,37 +4,49 @@ public class ShellUniverse implements Universe {
 
 	private boolean complete = false;	
 	private Background background = null;	
+	private Background foreground = null;	
 	private DisplayableSprite player1 = null;
 	private ArrayList<DisplayableSprite> sprites = new ArrayList<DisplayableSprite>();
+	private ArrayList<DisplayableSprite> barriers = new ArrayList<DisplayableSprite>();
+	private ArrayList<DisplayableSprite> oneWayBarriers = new ArrayList<DisplayableSprite>();
+	
+	private double XCenter = 0;
+	private double YCenter = 0;
 
 	public ShellUniverse () {
 
-		this.setXCenter(0);
-		this.setYCenter(0);
+		this.setXCenter(256);
+		this.setYCenter(192);
 		
 		background = new RepeatedStonyWall();
+		foreground = new StandardLevelLayout();
 		
-		player1 = new RangerCharacterSprite(10,10);
+		oneWayBarriers = foreground.getOneWayBarriers();
+		barriers = foreground.getBarriers();
+		
+		player1 = new RangerCharacterSprite(256,192);
 		sprites.add(player1);
 			
 	}
 
 	public double getScale() {
-		return 1;
+		return 2;
 	}
 
 	public double getXCenter() {
-		return 0;
+		return XCenter;
 	}
 
 	public double getYCenter() {
-		return 0;
+		return YCenter;
 	}
 
-	public void setXCenter(double xCenter) {
+	public void setXCenter(double newXCenter) {
+		XCenter = newXCenter;
 	}
 
-	public void setYCenter(double yCenter) {
+	public void setYCenter(double newYCenter) {
+		YCenter = newYCenter;
 	}
 
 	public boolean isComplete() {
@@ -48,6 +60,10 @@ public class ShellUniverse implements Universe {
 	public Background getBackground() {
 		return background;
 	}
+	
+	public Background getForeground() {
+		return foreground;
+	}
 
 	public DisplayableSprite getPlayer1() {
 		return player1;
@@ -60,6 +76,15 @@ public class ShellUniverse implements Universe {
 	public boolean centerOnPlayer() {
 		return false;
 	}		
+	
+	public ArrayList<DisplayableSprite> getBarriers() {
+		return barriers;
+	}
+
+	public ArrayList<DisplayableSprite> getOneWayBarriers() {
+		return oneWayBarriers;
+	}	
+
 
 	public void update(KeyboardInput keyboard, long actual_delta_time) {
 
@@ -77,6 +102,5 @@ public class ShellUniverse implements Universe {
 
 	public String toString() {
 		return "ShellUniverse";
-	}	
-
+	}
 }

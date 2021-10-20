@@ -49,6 +49,7 @@ public class AnimationFrame extends JFrame {
 	private DisplayableSprite player1 = null;
 	private ArrayList<DisplayableSprite> sprites = null;
 	private Background background = null;
+	private Background foreground = null;
 	boolean centreOnPlayer = false;
 	int universeLevel = 0;
 	
@@ -164,6 +165,7 @@ public class AnimationFrame extends JFrame {
 			sprites = universe.getSprites();
 			player1 = universe.getPlayer1();
 			background = universe.getBackground();
+			foreground = universe.getForeground();
 			centreOnPlayer = universe.centerOnPlayer();
 			this.scale = universe.getScale();
 			this.xCenter = universe.getXCenter();
@@ -273,6 +275,7 @@ public class AnimationFrame extends JFrame {
 			}
 
 			paintBackground(g, background);
+			paintBackground(g, foreground);
 
 			for (DisplayableSprite activeSprite : sprites) {
 				DisplayableSprite sprite = activeSprite;
