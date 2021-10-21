@@ -12,6 +12,8 @@ public class ShellUniverse implements Universe {
 	
 	private double XCenter = 0;
 	private double YCenter = 0;
+	
+	private double universeScale = 2;
 
 	public ShellUniverse () {
 
@@ -26,11 +28,13 @@ public class ShellUniverse implements Universe {
 		
 		player1 = new RangerCharacterSprite(256,192);
 		sprites.add(player1);
-			
+		sprites.addAll(barriers);
+		sprites.addAll(oneWayBarriers);
+		oneWayBarriers.addAll(barriers);
 	}
 
 	public double getScale() {
-		return 2;
+		return universeScale;
 	}
 
 	public double getXCenter() {

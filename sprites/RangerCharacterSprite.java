@@ -7,15 +7,14 @@ import javax.imageio.ImageIO;
 
 public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
-	private double ACCCELERATION_X = 10;		//PIXELS PER SECOND PER SECOND
+	private double ACCCELERATION_X = 15;		//PIXELS PER SECOND PER SECOND
 	private double ACCCELERATION_Y = 600; 	//PIXELS PER SECOND PER SECOND
-	private double MAX_VELOCITY_X = 400;	//PIXELS PER SECOND
+	private double MAX_VELOCITY_X = 600;	//PIXELS PER SECOND
 	private double MAX_VELOCITY_Y = 600;
-	private double FRICTION_FACTOR_X = 0.92; 
+	private double FRICTION_FACTOR_X = 0.90; 
 	
 	private boolean isJumping = false;
-	private final double INITIAL_JUMP_VELOCITY = 200; //pixels / second
-	private final double CONTINUE_JUMP_VELOCITY = 22;
+	private final double INITIAL_JUMP_VELOCITY = 300; //pixels / second
 	
 	private double velocityY = 0;
 	private double velocityX = 0;
@@ -40,7 +39,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		this.centerY = centerY;
 		
 		collisionDetection = new CollisionDetection();
-		collisionDetection.setBounceFactorX(0.5);
+		collisionDetection.setBounceFactorX(0);
 		collisionDetection.setBounceFactorY(0);
 		bounce = new TwoDimensionBounce();
 		
@@ -139,21 +138,23 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		boolean onGround = isOnGround(universe);
 		
 		// Jump
-		if (keyboard.keyDown(38)) {
+		if (onGround) {
+			if (keyboard.keyDown(38)) {
 			isJumping = true;
 			this.velocityY -= INITIAL_JUMP_VELOCITY;
 			onGround = false;
+			}
 		}
 		// RIGHT
 		if (keyboard.keyDown(39)) {
-			velocityX += + ACCCELERATION_X;
+			velocityX = +ACCCELERATION_X + velocityX;
 			if (velocityX > MAX_VELOCITY_X) {
 				velocityX = MAX_VELOCITY_X;
 			}
 		}
 		// LEFT
 		if (keyboard.keyDown(37)) {
-			velocityX -= ACCCELERATION_X;
+			velocityX = -ACCCELERATION_X + velocityX;
 			if (velocityX < - MAX_VELOCITY_X) {
 				velocityX = - MAX_VELOCITY_X;
 			}
@@ -197,6 +198,22 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 
 		setCenterX(centerX);
 		setCenterY(centerY);
+	}
+	
+	
+	private boolean checkOverlap(Universe sprites, String targetSprite) {
+
+		boolean overlap = false;
+
+		for (DisplayableSprite sprite : sprites.getSprites()) {
+			if (sprite.getClass().toString().contains(targetSprite)) {
+				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
+					overlap = true;
+					break;					
+				}
+			}
+		}		
+		return overlap;		
 	}
 	
 	private boolean isOnGround(Universe universe) {

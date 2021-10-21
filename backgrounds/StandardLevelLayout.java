@@ -1,6 +1,7 @@
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -87,4 +88,27 @@ public class StandardLevelLayout implements Background{
 		}
 	}
 
+	public ArrayList<DisplayableSprite> getOneWayBarriers() {
+		ArrayList<DisplayableSprite> oneWayBarriers = new ArrayList<DisplayableSprite>();
+		for (int row = 0; row < map[0].length; row++) {
+			for (int col = 0; col < map.length; col++) {
+				if (map[col][row] == 2) {
+					oneWayBarriers.add(new BarrierOneWay(row * TILE_WIDTH, col * TILE_HEIGHT, (row + 1) * TILE_WIDTH, (col + 1) * TILE_HEIGHT, true));
+				}
+			}
+		}
+		return oneWayBarriers;
+	}
+
+	public ArrayList<DisplayableSprite> getBarriers() {
+		ArrayList<DisplayableSprite> barriers = new ArrayList<DisplayableSprite>();
+		for (int row = 0; row < map[0].length; row++) {
+			for (int col = 0; col < map.length; col++) {
+				if ((map[col][row] == 1)) {
+					barriers.add(new BarrierSprite(row * TILE_WIDTH, col * TILE_HEIGHT, (row + 1) * TILE_WIDTH, (col + 1) * TILE_HEIGHT, true));
+				}
+			}
+		}
+		return barriers;
+	}
 }

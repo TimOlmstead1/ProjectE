@@ -1,6 +1,7 @@
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -67,6 +68,14 @@ public class RepeatedStonyWall implements Background{
 		else {
 			return 0;
 		}
+	}
+
+	public ArrayList<DisplayableSprite> getOneWayBarriers() {
+		return null;
+	}
+
+	public ArrayList<DisplayableSprite> getBarriers() {
+		return null;
 	}
 
 }
