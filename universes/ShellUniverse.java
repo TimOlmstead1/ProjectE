@@ -13,12 +13,14 @@ public class ShellUniverse implements Universe {
 	private double XCenter = 0;
 	private double YCenter = 0;
 	
-	private double universeScale = 2;
+	private double universeScale = 1.8;
+	
+	private ArrayList<DisplayableSprite> disposalList = new ArrayList<DisplayableSprite>();
 
 	public ShellUniverse () {
 
 		this.setXCenter(256);
-		this.setYCenter(192);
+		this.setYCenter(208);
 		
 		background = new RepeatedStonyWall();
 		foreground = new StandardLevelLayout();
@@ -26,11 +28,14 @@ public class ShellUniverse implements Universe {
 		oneWayBarriers = foreground.getOneWayBarriers();
 		barriers = foreground.getBarriers();
 		
-		player1 = new RangerCharacterSprite(256,192);
-		sprites.add(player1);
+		foreground.getOneWayBarriers();
+		foreground.getBarriers();
+		
+		player1 = new RangerCharacterSprite(StandardLevelLayout.TILE_HEIGHT * 16, StandardLevelLayout.TILE_WIDTH * 12);
 		sprites.addAll(barriers);
 		sprites.addAll(oneWayBarriers);
 		oneWayBarriers.addAll(barriers);
+		sprites.add(player1);
 	}
 
 	public double getScale() {
@@ -104,7 +109,32 @@ public class ShellUniverse implements Universe {
 		
 	}
 
+	protected void disposeSprites() {
+        
+    	//collect a list of sprites to dispose
+    	//this is done in a temporary list to avoid a concurrent modification exception
+		for (int i = 0; i < sprites.size(); i++) {
+			DisplayableSprite sprite = sprites.get(i);
+    		if (sprite.getDispose() == true) {
+    			disposalList.add(sprite);
+    		}
+    	}
+		
+		//go through the list of sprites to dispose
+		//note that the sprites are being removed from the original list
+		for (int i = 0; i < disposalList.size(); i++) {
+			DisplayableSprite sprite = disposalList.get(i);
+			sprites.remove(sprite);
+			System.out.println("Remove: " + sprite.toString());
+    	}
+		
+		//clear disposal list if necessary
+    	if (disposalList.size() > 0) {
+    		disposalList.clear();
+    	}
+    }
+
 	public String toString() {
-		return "ShellUniverse";
+		return "";
 	}
 }

@@ -2,51 +2,61 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
 public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
-	private double ACCCELERATION_X = 15;		//PIXELS PER SECOND PER SECOND
-	private double ACCCELERATION_Y = 600; 	//PIXELS PER SECOND PER SECOND
-	private double MAX_VELOCITY_X = 600;	//PIXELS PER SECOND
-	private double MAX_VELOCITY_Y = 600;
-	private double FRICTION_FACTOR_X = 0.90; 
+	private final double ACCCELERATION_X = 15;		//PIXELS PER SECOND PER SECOND
+	private final double ACCCELERATION_Y = 600; 	//PIXELS PER SECOND PER SECOND
+	private final double MAX_VELOCITY_X = 600;	//PIXELS PER SECOND
+	private final double MAX_VELOCITY_Y = 600;
+	private final double FRICTION_FACTOR_X = 0.90; 
+	private final double INITIAL_JUMP_VELOCITY = 320; //pixels / second
 	
 	private boolean isJumping = false;
-	private final double INITIAL_JUMP_VELOCITY = 300; //pixels / second
 	
 	private double velocityY = 0;
 	private double velocityX = 0;
 
-	private static BufferedImage[] rangerSprites = null;
+	private static BufferedImage[] rangerSprites;
+	private double animationCount = 0;
+	private boolean wasTravelingRight = false;
+	
 	private boolean visible = true;
 	private double centerX = 0;
 	private double centerY = 0;
 	
-	final private int width = 32;
-	final private int height = 32;
-	final private int cols = 5;
-	final private int rows = 10;
+	private double width = 26;
+	private double height = 32;
+	private int cols = 8;
+	private int rows = 10;
 	
 	private boolean dispose = false;
 	
 	private CollisionDetection collisionDetection;
 	TwoDimensionBounce bounce;
 	
-	public RangerCharacterSprite(int centerX, int centerY) {
+	public RangerCharacterSprite(double centerX, double centerY, double height, double width) {
+		this(centerX,centerY);
+		this.height = height;
+		this.width = width;
+	}
+	
+	public RangerCharacterSprite(double centerX, double centerY) {
 		this.centerX = centerX;
 		this.centerY = centerY;
 		
 		collisionDetection = new CollisionDetection();
+		bounce = new TwoDimensionBounce();
 		collisionDetection.setBounceFactorX(0);
 		collisionDetection.setBounceFactorY(0);
-		bounce = new TwoDimensionBounce();
 		
 		Image image = null;
 		
 		try {
-			image = ImageIO.read(new File("res/NobleRanger(Edit).png"));
+			image = ImageIO.read(new File("res/NobleRanger(32x26).png"));
 		}
 		catch (IOException e) {
 			System.out.print(e.toString());
@@ -60,17 +70,87 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		    for (int j = 0; j < cols; j++){ 
 		    	
 		    	rangerSprites[(i * cols) + j] = ((BufferedImage) image).getSubimage( 
-		            i * width, 
-		            j * height, 
-		            width, 
-		            height 
+		    		i * (int)width, 
+		    		j *(int)height, 
+		            (int)width, 
+		            (int)height 
 		        ); 
 		    } 
 		} 
 	}
 
 	public Image getImage() {
-		return rangerSprites[32];
+		if (velocityY > 1){
+			if (wasTravelingRight){
+				return rangerSprites[76];
+			}
+			else {
+				return rangerSprites[0];
+			}
+		}
+		else if (velocityY < -1){
+			if (wasTravelingRight){
+				return rangerSprites[68];
+			}
+			else {
+				return rangerSprites[8];
+			}
+		}
+		else if (velocityX > 1){
+			wasTravelingRight = true;
+			if (animationCount <= 10) {
+				animationCount++;
+				return rangerSprites[4];
+			}else if (animationCount <= 20){
+				animationCount++;
+				return rangerSprites[12];
+			}else if (animationCount <= 30){
+				animationCount++;
+				return rangerSprites[20];
+			}else if (animationCount <= 40){
+				animationCount++;
+				return rangerSprites[28];
+			}else if (animationCount <= 50){
+				animationCount++;
+				return rangerSprites[36];
+			}else if (animationCount <= 60){
+				animationCount++;
+				return rangerSprites[44];
+			}else if (animationCount <= 70){
+				animationCount = 0;
+				return rangerSprites[52];
+			}
+		}
+		
+		else if (velocityX < -1){
+			wasTravelingRight = false;
+			if (animationCount <= 10) {
+				animationCount++;
+				return rangerSprites[24];
+			}else if (animationCount <= 20){
+				animationCount++;
+				return rangerSprites[32];
+			}else if (animationCount <= 30){
+				animationCount++;
+				return rangerSprites[40];
+			}else if (animationCount <= 40){
+				animationCount++;
+				return rangerSprites[48];
+			}else if (animationCount <= 50){
+				animationCount++;
+				return rangerSprites[56];
+			}else if (animationCount <= 60){
+				animationCount++;
+				return rangerSprites[64];
+			}else if (animationCount <= 70){
+				animationCount = 0;
+				return rangerSprites[72];
+			}
+		}
+		else if (wasTravelingRight) {
+			return rangerSprites[5];
+		}
+		return rangerSprites[73];
 	}
 
 	public boolean getVisible() {
@@ -78,19 +158,19 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	}
 
 	public double getMinX() {
-		return centerX - (width / 2);
+		return centerX - (width/2);
 	}
 
 	public double getMaxX() {
-		return centerX + (width / 2);
+		return centerX + (width/2);
 	}
 
 	public double getMinY() {
-		return centerY - (height / 2);
+		return centerY - (height/2);
 	}
 
 	public double getMaxY() {
-		return centerY + (height / 2);
+		return centerY + (height/2);
 	}
 
 	public double getHeight() {
@@ -140,21 +220,21 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		// Jump
 		if (onGround) {
 			if (keyboard.keyDown(38)) {
-			isJumping = true;
-			this.velocityY -= INITIAL_JUMP_VELOCITY;
-			onGround = false;
+				isJumping = true;
+				this.velocityY -= INITIAL_JUMP_VELOCITY;
+				onGround = false;
 			}
 		}
 		// RIGHT
 		if (keyboard.keyDown(39)) {
-			velocityX = +ACCCELERATION_X + velocityX;
+			velocityX += ACCCELERATION_X;
 			if (velocityX > MAX_VELOCITY_X) {
 				velocityX = MAX_VELOCITY_X;
 			}
 		}
 		// LEFT
 		if (keyboard.keyDown(37)) {
-			velocityX = -ACCCELERATION_X + velocityX;
+			velocityX -= ACCCELERATION_X;
 			if (velocityX < - MAX_VELOCITY_X) {
 				velocityX = - MAX_VELOCITY_X;
 			}
@@ -165,15 +245,15 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 			if (velocityY < - MAX_VELOCITY_Y) {
 				velocityY = - MAX_VELOCITY_Y;
 			}
+			
 		}
-		
 		this.velocityX = this.velocityX * FRICTION_FACTOR_X;
 		
 		if (velocityY < 0) {
 			collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
 		}
 		else if(velocityY >= 0) {
-			if (keyboard.keyDown(40)) {
+			if (keyboard.keyDown(40)){
 				collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
 			}
 			else {
@@ -181,7 +261,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 			}
 		}
 		this.centerX = bounce.newX + (width / 2);
-		this.centerY = bounce.newY + (width / 2);
+		this.centerY = bounce.newY + (height / 2);
 		this.velocityX = bounce.newVelocityX;
 		this.velocityY = bounce.newVelocityY;
 
@@ -194,12 +274,9 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 			if (this.velocityY > MAX_VELOCITY_Y)
 				this.velocityY = MAX_VELOCITY_Y;
 		}
-			
-
-		setCenterX(centerX);
-		setCenterY(centerY);
+		onGround = isOnGround(universe);
+		
 	}
-	
 	
 	private boolean checkOverlap(Universe sprites, String targetSprite) {
 
@@ -227,5 +304,5 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 			}
 		}
 		return onGround;
-	}
+	}	
 }

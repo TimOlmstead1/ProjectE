@@ -202,5 +202,5 @@ public class CollisionDetection {
 			oneDBounce.didBounce = false;
 		}
 
-	}	
+	}		
 }

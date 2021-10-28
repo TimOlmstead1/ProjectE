@@ -7,10 +7,11 @@ import javax.imageio.ImageIO;
 
 public class StandardLevelLayout implements Background{
 	
-	protected static int TILE_WIDTH = 16;
-    protected static int TILE_HEIGHT = 16;
+	protected static int TILE_WIDTH = 8;
+    protected static int TILE_HEIGHT = 8;
     
     private Image wall;
+    private Image woodenPlatform;
     
     private int maxCols = 0;
     private int maxRows = 0;    
@@ -23,12 +24,14 @@ public class StandardLevelLayout implements Background{
 	public StandardLevelLayout() {
 		try {
 			this.wall = ImageIO.read(new File("res/MapElements/DarkLevelWall(16x16).png"));
+			this.woodenPlatform = ImageIO.read(new File("res/MapElements/DarkLevelWall(16x16).png"));
 		}	
 		catch(IOException e) {
     		System.out.println(e.toString());
 		}
 		
 		map = CSVReader.importFromCSV("res/CSVMaps/BaseLevel.csv");
+		
     	
     	maxRows = map.length - 1;
     	maxCols = map[0].length - 1;
@@ -41,8 +44,11 @@ public class StandardLevelLayout implements Background{
 		if (row < 0 || row > maxRows || col < 0 || col > maxCols) {
 			image = null;
 		}
-		else if (map[row][col] == 1) {
+		else if ((map[row][col] == 1)||(map[row][col] == 2)) {
 			image = wall;
+		}
+		else if (map[row][col] == 3) {
+			image = woodenPlatform;
 		}
 		
 		int x = (col * TILE_WIDTH);
@@ -92,7 +98,7 @@ public class StandardLevelLayout implements Background{
 		ArrayList<DisplayableSprite> oneWayBarriers = new ArrayList<DisplayableSprite>();
 		for (int row = 0; row < map[0].length; row++) {
 			for (int col = 0; col < map.length; col++) {
-				if (map[col][row] == 2) {
+				if (map[col][row] == 3) {
 					oneWayBarriers.add(new BarrierOneWay(row * TILE_WIDTH, col * TILE_HEIGHT, (row + 1) * TILE_WIDTH, (col + 1) * TILE_HEIGHT, true));
 				}
 			}
