@@ -1,4 +1,5 @@
 import java.awt.Image;
+import java.awt.MouseInfo;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,8 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
 	private CollisionDetection collisionDetection;
 	TwoDimensionBounce bounce;
+	
+	private int health;
 	
 	public RangerCharacterSprite(double centerX, double centerY, double height, double width) {
 		this(centerX,centerY);
@@ -213,6 +216,15 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		velocityY = 0;
 		velocityX = 0;
 	}
+	
+	public int getHealth() {
+		return health;
+	}
+
+	public void setHealth(int health) {
+		this.health = health;
+	}
+	
 	public void update(Universe universe, KeyboardInput keyboard, long actual_delta_time) {
 		
 		boolean onGround = isOnGround(universe);
@@ -276,6 +288,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		}
 		onGround = isOnGround(universe);
 		
+		
 	}
 	
 	private boolean checkOverlap(Universe sprites, String targetSprite) {
@@ -304,5 +317,5 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 			}
 		}
 		return onGround;
-	}	
+	}
 }

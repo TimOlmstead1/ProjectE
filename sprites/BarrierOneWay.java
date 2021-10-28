@@ -6,7 +6,7 @@ import javax.imageio.ImageIO;
 
 public class BarrierOneWay implements DisplayableSprite {
 
-	private static Image image;
+	public static Image image = null;
 	private boolean visible = true;
 	private double centerX = 0;
 	private double centerY = 0;

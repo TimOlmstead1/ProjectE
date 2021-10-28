@@ -1,3 +1,4 @@
+import java.awt.MouseInfo;
 import java.util.ArrayList;
 
 public class ShellUniverse implements Universe {
@@ -13,7 +14,7 @@ public class ShellUniverse implements Universe {
 	private double XCenter = 0;
 	private double YCenter = 0;
 	
-	private double universeScale = 1.8;
+	private double universeScale = 1.7;
 	
 	private ArrayList<DisplayableSprite> disposalList = new ArrayList<DisplayableSprite>();
 
@@ -93,6 +94,11 @@ public class ShellUniverse implements Universe {
 	public ArrayList<DisplayableSprite> getOneWayBarriers() {
 		return oneWayBarriers;
 	}	
+	
+	public void shootArrow() {
+		MouseInfo.getPointerInfo().getLocation().getX();
+		MouseInfo.getPointerInfo().getLocation().getY();
+	}
 
 
 	public void update(KeyboardInput keyboard, long actual_delta_time) {

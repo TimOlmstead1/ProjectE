@@ -1,8 +1,11 @@
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -12,7 +15,7 @@ import java.awt.event.WindowEvent;
 public class AnimationFrame extends JFrame {
 
 	final public static int FRAMES_PER_SECOND = 60;
-	final public static int SCREEN_HEIGHT = 750;
+	final public static int SCREEN_HEIGHT = 700;
 	final public static int SCREEN_WIDTH = 1000;
 
 	private int xpCenter = SCREEN_WIDTH / 2;
@@ -42,6 +45,7 @@ public class AnimationFrame extends JFrame {
 	private boolean isPaused = false;
 
 	private KeyboardInput keyboard = new KeyboardInput();
+	
 	private Universe universe = null;
 
 	//local (and direct references to various objects in universe ... should reduce lag by avoiding dynamic lookup
@@ -79,7 +83,40 @@ public class AnimationFrame extends JFrame {
 				keyboard.keyReleased(arg0);
 			}
 		});
+		
+		this.addMouseListener(new MouseListener() {
 
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+			
 		Container cp = getContentPane();
 		cp.setBackground(Color.BLACK);
 		cp.setLayout(null);
