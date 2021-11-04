@@ -5,6 +5,9 @@ import javax.imageio.ImageIO;
 
 public class ArrowSprite implements Projectile{
 	
+	private static final int WIDTH = 8;
+	private static final int HEIGHT = 8;
+	
 	private double centerX;
 	private double centerY;
 	private double width;
@@ -14,10 +17,11 @@ public class ArrowSprite implements Projectile{
 	private double velocityX;
 	private double velocityY;
 	
-	private final double RESULTANT_VELOCITY = 320;
+	private final double RESULTANT_VELOCITY = 200;
 	
-	private double angle;
-	private static Image[] rotatedImages = new Image[360];
+	private double angle; //in radians
+	//private static Image[] rotatedImages = new Image[360];
+	private static Image image = null;
 	
 	private int damage = 1;
 	
@@ -26,31 +30,35 @@ public class ArrowSprite implements Projectile{
 		this.centerY = centerY;
 		this.angle = angle;
 		
-		Image image = null;
-		
 		if (image == null) {
 			try {
-				image = ImageIO.read(new File("res/Arrow.png"));
+				image = ImageIO.read(new File("res/ArrowBall.png"));
 			}
 			catch (IOException e) {
 				System.out.print(e.toString());
 			}
 			
-			if (image != null) {
-				for (int i = 0; i < 360; i++) {
-					rotatedImages[i] = ImageRotator.rotate(image, i);			
-				}
-				this.height = image.getHeight(null);
-				this.width = image.getWidth(null);
-			}
+//			if (image != null) {
+//				for (int i = 0; i < 360; i++) {
+//					rotatedImages[i] = ImageRotator.rotate(image, i);			
+//				}
+//			}
 		}
+		this.width =  WIDTH;
+		this.height = HEIGHT;
 		
 		velocityX = Math.cos(angle)*(RESULTANT_VELOCITY);
 		velocityY = Math.sin(angle)*(RESULTANT_VELOCITY);
 	}
 
 	public Image getImage() {
-		return rotatedImages[(int)angle];
+//		if ((int)Math.toDegrees(angle) >= 0) {
+//			return rotatedImages[((int)Math.toDegrees(angle))];
+//		}
+//		else {
+//			return rotatedImages[(360+((int)Math.toDegrees(angle)))];
+//		}
+		return image;
 	}
 
 	public boolean getVisible() {
@@ -102,7 +110,7 @@ public class ArrowSprite implements Projectile{
 		dispose = true;
 	}
 
-	public void update(Universe universe, KeyboardInput keyboard, long actual_delta_time) {
+	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 		double movement_x = (this.velocityX * actual_delta_time * 0.001);
 		double movement_y = (this.velocityY * actual_delta_time * 0.001);
 		    
@@ -115,12 +123,12 @@ public class ArrowSprite implements Projectile{
 	private void checkWallCollision(Universe universe) {
 		for (int i = 0; i < universe.getSprites().size(); i++) {
 			
-			DisplayableSprite sprite = universe.getBarriers().get(i);
+			DisplayableSprite sprite = universe.getSprites().get(i);
 			
 			if (sprite instanceof BarrierSprite) {
 				
-				if (CollisionDetection.pixelBasedOverlaps(this, sprite))
-				{
+				if (CollisionDetection.pixelBasedOverlaps(this, sprite)){
+					
 					if (sprite instanceof BarrierSprite) {
 						//dispose of arrow
 						this.dispose = true;

@@ -225,7 +225,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		this.health = health;
 	}
 	
-	public void update(Universe universe, KeyboardInput keyboard, long actual_delta_time) {
+	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 		
 		boolean onGround = isOnGround(universe);
 		
@@ -288,7 +288,41 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		}
 		onGround = isOnGround(universe);
 		
+		if (mouse.buttonDownOnce(1)) {
+			double mouseX = mouse.getPosition().getX();
+			double mouseY = mouse.getPosition().getY();
+			//System.out.println(String.format("mouse position: %7.2f, %7.2f", mouseX, mouseY));
+			
+			double convertedMouseX = ((mouseX - 64)/ universe.getScale()) - (universe.getXCenter());   // the 64 comes from the way the frame is drawn rectangularly so the origin is actually 64 pixels (the width of a stony wall tile) further to the right with this particular universe scale 
+			double convertedMouseY = ((mouseY / universe.getScale()) - universe.getYCenter());
+			
+			//System.out.println(String.format("mouse Converted position: %7.2f, %7.2f", convertedMouseX, convertedMouseY));
+			
+			shoot(universe, convertedMouseX, convertedMouseY);
+		}
 		
+	}
+	
+	public void shoot(Universe universe, double mouseCenterX, double mouseCenterY) {
+		
+		double relativeScreenCenterX = ((centerX - universe.getXCenter()) - mouseCenterX);
+		double relativeScreenCenterY = ((centerY - universe.getYCenter()) - mouseCenterY);
+		
+		double angleRadians = Math.atan((relativeScreenCenterY)/(relativeScreenCenterX));
+		
+		if ((centerX - universe.getXCenter()) > mouseCenterX) {
+			if (angleRadians < 0) {
+				angleRadians = -1*((Math.PI) - angleRadians);
+			}
+			else {
+				angleRadians = (Math.PI) + angleRadians;
+			}
+		}
+		
+		System.out.println(String.format("%7.2f", Math.toDegrees(angleRadians)));
+		
+		Projectile arrow = new ArrowSprite(centerX, centerY, angleRadians);
+		universe.getSprites().add(arrow);
 	}
 	
 	private boolean checkOverlap(Universe sprites, String targetSprite) {

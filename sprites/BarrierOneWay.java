@@ -85,7 +85,7 @@ public class BarrierOneWay implements DisplayableSprite {
 		return dispose;
 	}
 
-	public void update(Universe universe, KeyboardInput keyboard, long actual_delta_time) {
+	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 			
 	}
 

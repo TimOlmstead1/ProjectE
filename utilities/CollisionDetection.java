@@ -87,7 +87,7 @@ public class CollisionDetection {
 					}
 				}
 			}
-		}	
+		}
 		
 		return false;
 		

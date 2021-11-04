@@ -23,8 +23,8 @@ public class AnimationFrame extends JFrame {
 
 	private double scale = 1;
 	//point in universe on which the screen will center
-	private double xCenter = 0;		
-	private double yCenter = 0;
+	private double xpFrameCenter = 0;		
+	private double ypFrameCenter = 0;
 
 	private JPanel panel = null;
 	private JButton btnPauseRun;
@@ -45,6 +45,7 @@ public class AnimationFrame extends JFrame {
 	private boolean isPaused = false;
 
 	private KeyboardInput keyboard = new KeyboardInput();
+	private MouseInput mouse;
 	
 	private Universe universe = null;
 
@@ -60,7 +61,7 @@ public class AnimationFrame extends JFrame {
 	public AnimationFrame(Animation animation)
 	{
 		super("");
-		
+	
 		this.animation = animation;
 		this.setVisible(true);		
 		this.setFocusable(true);
@@ -81,39 +82,6 @@ public class AnimationFrame extends JFrame {
 			@Override
 			public void keyReleased(KeyEvent arg0) {
 				keyboard.keyReleased(arg0);
-			}
-		});
-		
-		this.addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
 			
@@ -174,7 +142,13 @@ public class AnimationFrame extends JFrame {
 		lblStatus.setBounds(0, SCREEN_HEIGHT - 30 - 16, SCREEN_WIDTH, 36);
 		getContentPane().add(lblStatus);
 		getContentPane().setComponentZOrder(lblStatus, 0);
-
+		
+		mouse = new MouseInput(panel);
+		addMouseListener( mouse );
+		addMouseMotionListener( mouse );
+		panel.addMouseListener( mouse );
+		panel.addMouseMotionListener( mouse );
+		mouse.setCenter(new Point(xpCenter, ypCenter));
 	}
 
 	public void start()
@@ -205,8 +179,8 @@ public class AnimationFrame extends JFrame {
 			foreground = universe.getForeground();
 			centreOnPlayer = universe.centerOnPlayer();
 			this.scale = universe.getScale();
-			this.xCenter = universe.getXCenter();
-			this.yCenter = universe.getYCenter();
+			this.xpFrameCenter = universe.getXCenter();
+			this.ypFrameCenter = universe.getYCenter();
 
 			// main game loop
 			while (stop == false && universe.isComplete() == false) {
@@ -234,10 +208,13 @@ public class AnimationFrame extends JFrame {
 				//read input
 				keyboard.poll();
 				handleKeyboardInput();
-
+				
+				mouse.poll();
+				
 				//UPDATE STATE
+				
 				updateTime();
-				universe.update(keyboard, actual_delta_time);
+				universe.update(keyboard, mouse, actual_delta_time);
 				updateControls();
 
 				//REFRESH
@@ -296,6 +273,9 @@ public class AnimationFrame extends JFrame {
 		if (keyboard.keyDown(113)) {
 			scale /= 1.01;
 		}
+		if (keyboard.keyDownOnce(27)) {
+			mouse.setRelative(false);
+		}
 	}
 
 	class DrawPanel extends JPanel {
@@ -307,8 +287,8 @@ public class AnimationFrame extends JFrame {
 			}
 
 			if (player1 != null && centreOnPlayer) {
-				xCenter = player1.getCenterX();
-				yCenter = player1.getCenterY();     
+				xpFrameCenter = player1.getCenterX();
+				ypFrameCenter = player1.getCenterY();     
 			}
 
 			paintBackground(g, background);
@@ -318,11 +298,11 @@ public class AnimationFrame extends JFrame {
 				DisplayableSprite sprite = activeSprite;
 				if (sprite.getVisible()) {
 					if (sprite.getImage() != null) {
-						g.drawImage(sprite.getImage(), translateX(sprite.getMinX()), translateY(sprite.getMinY()), scaleX(sprite.getWidth()), scaleY(sprite.getHeight()), null);
+						g.drawImage(sprite.getImage(), translatePixelToLogicalX(sprite.getMinX()), translatePixelToLogicalY(sprite.getMinY()), scaleX(sprite.getWidth()), scaleY(sprite.getHeight()), null);
 					}
 					else {
 						g.setColor(Color.BLUE);
-						g.fillRect(translateX(scale * (sprite.getMinX())), translateY(sprite.getMinY()), scaleX(sprite.getWidth()), scaleY(sprite.getHeight()));					
+						g.fillRect(translatePixelToLogicalX(scale * (sprite.getMinX())), translatePixelToLogicalY(sprite.getMinY()), scaleX(sprite.getWidth()), scaleY(sprite.getHeight()));					
 					}
 				}
 
@@ -330,15 +310,37 @@ public class AnimationFrame extends JFrame {
 
 		}
 		
-		private int translateX(double x) {
-			return xpCenter + scaleX(x - xCenter);
+		private int translatePixelToLogicalX(double x) {
+			return xpCenter + scaleX(x - xpFrameCenter);
 		}
-		
+				
 		private int scaleX(double x) {
 			return (int) Math.round(scale * x);
 		}
-		private int translateY(double y) {
-			return ypCenter + scaleY(y - yCenter);
+		
+		
+//		xpCenter + scaleX(x - xCenter)
+//		(int) Math.round(scale * (x - xcenter) );
+//		
+//		xLogical = xpCenter + (int) Math.round(scale * (x - xcenter));
+//
+//			
+//		private double convertX(double mousePixelPositionX) {
+//			
+//			double logicalMousePosition = xpCenter + Math.round(scale * (mousePixelPositionX - xpFrameCenter));
+//					
+//			return logicalMousePosition;
+//		}
+//		
+//		private double convertY(double mousePixelPositionY) {
+//			
+//			double logicalMousePosition = ypCenter + Math.round(scale * (mousePixelPositionY - yCenter));
+//					
+//			return logicalMousePosition;
+//		}
+		
+		private int translatePixelToLogicalY(double y) {
+			return ypCenter + scaleY(y - ypFrameCenter);
 		}		
 		private int scaleY(double y) {
 			return (int) Math.round(scale * y);
@@ -351,8 +353,8 @@ public class AnimationFrame extends JFrame {
 			}
 			
 			//what tile covers the top-left corner?
-			double xTopLeft = ( xCenter - (xpCenter / scale));
-			double yTopLeft =  (yCenter - (ypCenter / scale)) ;
+			double xTopLeft = ( xpFrameCenter - (xpCenter / scale));
+			double yTopLeft =  (ypFrameCenter - (ypCenter / scale)) ;
 			
 			int row = background.getRow((int)yTopLeft);
 			int col = background.getCol((int)xTopLeft);
@@ -372,12 +374,12 @@ public class AnimationFrame extends JFrame {
 					}
 					else {
 						Tile nextTile = background.getTile(col+1, row+1);
-						int pwidth = translateX(nextTile.getMinX()) - translateX(tile.getMinX());
-						int pheight = translateY(nextTile.getMinY()) - translateY(tile.getMinY());
-						g.drawImage(tile.getImage(), translateX(tile.getMinX()), translateY(tile.getMinY()), pwidth, pheight, null);
+						int pwidth = translatePixelToLogicalX(nextTile.getMinX()) - translatePixelToLogicalX(tile.getMinX());
+						int pheight = translatePixelToLogicalY(nextTile.getMinY()) - translatePixelToLogicalY(tile.getMinY());
+						g.drawImage(tile.getImage(), translatePixelToLogicalX(tile.getMinX()), translatePixelToLogicalY(tile.getMinY()), pwidth, pheight, null);
 					}					
 					//does the RHE of this tile extend past the RHE of the visible area?
-					if (translateX(tile.getMinX() + tile.getWidth()) > SCREEN_WIDTH || tile.isOutOfBounds()) {
+					if (translatePixelToLogicalX(tile.getMinX() + tile.getWidth()) > SCREEN_WIDTH || tile.isOutOfBounds()) {
 						rowDrawn = true;
 					}
 					else {
@@ -385,7 +387,7 @@ public class AnimationFrame extends JFrame {
 					}
 				}
 				//does the bottom edge of this tile extend past the bottom edge of the visible area?
-				if (translateY(tile.getMinY() + tile.getHeight()) > SCREEN_HEIGHT || tile.isOutOfBounds()) {
+				if (translatePixelToLogicalY(tile.getMinY() + tile.getHeight()) > SCREEN_HEIGHT || tile.isOutOfBounds()) {
 					screenDrawn = true;
 				}
 				else {

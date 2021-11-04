@@ -5,6 +5,8 @@ public interface Universe {
 	//STATIC VARIABLES
 	
 	//INSTANCE VARIABLES
+	
+	
 
 	public double getScale();
 
@@ -26,9 +28,8 @@ public interface Universe {
 	public boolean centerOnPlayer();
 
 	public ArrayList<DisplayableSprite> getSprites();	
-	
 
-	public void update(KeyboardInput keyboard, long actual_delta_time);
+	public void update(KeyboardInput keyboard, MouseInput mouse, long actual_delta_time);
     
 	
 }

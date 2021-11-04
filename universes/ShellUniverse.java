@@ -10,14 +10,14 @@ public class ShellUniverse implements Universe {
 	private ArrayList<DisplayableSprite> sprites = new ArrayList<DisplayableSprite>();
 	private ArrayList<DisplayableSprite> barriers = new ArrayList<DisplayableSprite>();
 	private ArrayList<DisplayableSprite> oneWayBarriers = new ArrayList<DisplayableSprite>();
+	private ArrayList<DisplayableSprite> disposalList = new ArrayList<DisplayableSprite>();
+
 	
 	private double XCenter = 0;
 	private double YCenter = 0;
 	
 	private double universeScale = 1.7;
 	
-	private ArrayList<DisplayableSprite> disposalList = new ArrayList<DisplayableSprite>();
-
 	public ShellUniverse () {
 
 		this.setXCenter(256);
@@ -94,14 +94,8 @@ public class ShellUniverse implements Universe {
 	public ArrayList<DisplayableSprite> getOneWayBarriers() {
 		return oneWayBarriers;
 	}	
-	
-	public void shootArrow() {
-		MouseInfo.getPointerInfo().getLocation().getX();
-		MouseInfo.getPointerInfo().getLocation().getY();
-	}
 
-
-	public void update(KeyboardInput keyboard, long actual_delta_time) {
+	public void update(KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 
 		if (keyboard.keyDownOnce(27)) {
 			complete = true;
@@ -109,9 +103,10 @@ public class ShellUniverse implements Universe {
 		
 		for (int i = 0; i < sprites.size(); i++) {
 			DisplayableSprite sprite = sprites.get(i);
-			sprite.update(this, keyboard, actual_delta_time);
+			sprite.update(this, keyboard, mouse, actual_delta_time);
     	} 
 		
+		disposeSprites();
 		
 	}
 
