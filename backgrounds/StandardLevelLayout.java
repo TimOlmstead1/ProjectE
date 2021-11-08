@@ -24,7 +24,7 @@ public class StandardLevelLayout implements Background{
 	public StandardLevelLayout() {
 		try {
 			this.wall = ImageIO.read(new File("res/MapElements/DarkLevelWall(16x16).png"));
-			this.woodenPlatform = ImageIO.read(new File("res/MapElements/DarkLevelWall(16x16).png"));
+			this.woodenPlatform = ImageIO.read(new File("res/MapElements/oneWayWood.png"));
 		}	
 		catch(IOException e) {
     		System.out.println(e.toString());

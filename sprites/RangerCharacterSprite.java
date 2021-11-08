@@ -12,9 +12,13 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	private final double ACCCELERATION_X = 15;		//PIXELS PER SECOND PER SECOND
 	private final double ACCCELERATION_Y = 600; 	//PIXELS PER SECOND PER SECOND
 	private final double MAX_VELOCITY_X = 600;	//PIXELS PER SECOND
-	private final double MAX_VELOCITY_Y = 600;
+	private final double MAX_VELOCITY_Y = 400;
 	private final double FRICTION_FACTOR_X = 0.90; 
 	private final double INITIAL_JUMP_VELOCITY = 320; //pixels / second
+	
+	private final double RELOAD_TIME = 500;
+	
+	private Universe currentUniverse = null;
 	
 	private boolean isJumping = false;
 	
@@ -38,6 +42,11 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
 	private CollisionDetection collisionDetection;
 	TwoDimensionBounce bounce;
+	
+	private double convertedMouseX;
+	private double convertedMouseY;
+	private double reloadTime = 0;
+	private boolean shooting = false;
 	
 	private int health;
 	
@@ -83,6 +92,81 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	}
 
 	public Image getImage() {
+		if (shooting) {
+			if (((centerX - currentUniverse.getXCenter()) < convertedMouseX)){
+				if (animationCount <= 10) {
+					animationCount++;
+					return rangerSprites[6];
+				}else if (animationCount <= 20){
+					animationCount++;
+					return rangerSprites[14];
+				}else if (animationCount <= 30){
+					animationCount++;
+					return rangerSprites[22];
+				}else if (animationCount <= 40){
+					animationCount++;
+					return rangerSprites[30];
+				}else if (animationCount <= 50){
+					animationCount++;
+					return rangerSprites[38];
+				}else if (animationCount <= 60){
+					animationCount++;
+					return rangerSprites[46];
+				}else if (animationCount <= 70){
+					animationCount++;
+					return rangerSprites[54];
+				}else if (animationCount <= 80){
+					animationCount++;
+					shoot(currentUniverse, convertedMouseX, convertedMouseY);
+					return rangerSprites[62];
+				}else if (animationCount <= 90){
+					animationCount++;
+					return rangerSprites[70];
+				}else if (animationCount <= 100){
+					animationCount = 0;
+					shooting = false;
+					return rangerSprites[78];
+				}		
+				
+			}
+			else {
+				if (animationCount <= 10) {
+					animationCount++;
+					return rangerSprites[74];
+				}else if (animationCount <= 20){
+					animationCount++;
+					return rangerSprites[66];
+				}else if (animationCount <= 30){
+					animationCount++;
+					return rangerSprites[58];
+				}else if (animationCount <= 40){
+					animationCount++;
+					return rangerSprites[50];
+				}else if (animationCount <= 50){
+					animationCount++;
+					return rangerSprites[42];
+				}else if (animationCount <= 60){
+					animationCount++;
+					return rangerSprites[34];
+				}else if (animationCount <= 70){
+					animationCount++;
+					return rangerSprites[26];
+				}else if (animationCount <= 80){
+					animationCount++;
+					shoot(currentUniverse, convertedMouseX, convertedMouseY);
+					return rangerSprites[18];
+				}else if (animationCount <= 90){
+					animationCount++;
+					return rangerSprites[10];
+				}else if (animationCount <= 100){
+					animationCount = 0;
+					shooting = false;
+					return rangerSprites[2];
+				}
+				
+			}
+		}
+		
 		if (velocityY > 1){
 			if (wasTravelingRight){
 				return rangerSprites[76];
@@ -227,6 +311,10 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
 	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 		
+		if (currentUniverse == null) {
+			currentUniverse = universe;
+		}
+		
 		boolean onGround = isOnGround(universe);
 		
 		// Jump
@@ -288,41 +376,48 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		}
 		onGround = isOnGround(universe);
 		
-		if (mouse.buttonDownOnce(1)) {
+		if (mouse.buttonDown(1)) {
+			
+			shooting = true;
+			
 			double mouseX = mouse.getPosition().getX();
 			double mouseY = mouse.getPosition().getY();
 			//System.out.println(String.format("mouse position: %7.2f, %7.2f", mouseX, mouseY));
 			
-			double convertedMouseX = ((mouseX - 64)/ universe.getScale()) - (universe.getXCenter());   // the 64 comes from the way the frame is drawn rectangularly so the origin is actually 64 pixels (the width of a stony wall tile) further to the right with this particular universe scale 
-			double convertedMouseY = ((mouseY / universe.getScale()) - universe.getYCenter());
+			convertedMouseX = ((mouseX - 64)/ universe.getScale()) - (universe.getXCenter());   // the 64 comes from the way the frame is drawn rectangularly so the origin is actually 64 pixels (the width of a stony wall tile) further to the right with this particular universe scale 
+			convertedMouseY = ((mouseY / universe.getScale()) - universe.getYCenter());
 			
 			//System.out.println(String.format("mouse Converted position: %7.2f, %7.2f", convertedMouseX, convertedMouseY));
-			
-			shoot(universe, convertedMouseX, convertedMouseY);
-		}
+		}		
+		
+		reloadTime -= actual_delta_time;
 		
 	}
 	
 	public void shoot(Universe universe, double mouseCenterX, double mouseCenterY) {
 		
-		double relativeScreenCenterX = ((centerX - universe.getXCenter()) - mouseCenterX);
-		double relativeScreenCenterY = ((centerY - universe.getYCenter()) - mouseCenterY);
+		if (reloadTime <= 0) {
 		
-		double angleRadians = Math.atan((relativeScreenCenterY)/(relativeScreenCenterX));
+			double relativeScreenCenterX = ((centerX - universe.getXCenter()) - mouseCenterX);
+			double relativeScreenCenterY = ((centerY - universe.getYCenter()) - mouseCenterY);
+			
+			double angleRadians = Math.atan((relativeScreenCenterY)/(relativeScreenCenterX));
 		
-		if ((centerX - universe.getXCenter()) > mouseCenterX) {
-			if (angleRadians < 0) {
-				angleRadians = -1*((Math.PI) - angleRadians);
+			if ((centerX - universe.getXCenter()) > mouseCenterX) {
+				if (angleRadians < 0) {
+					angleRadians = -1*((Math.PI) - angleRadians);
+				}
+				else {
+					angleRadians = (Math.PI) + angleRadians;
+				}
 			}
-			else {
-				angleRadians = (Math.PI) + angleRadians;
-			}
+		
+			//System.out.println(String.format("%7.2f", Math.toDegrees(angleRadians))); //for testing angles
+		
+			Projectile arrow = new ArrowSprite(centerX, centerY, angleRadians);
+			universe.getSprites().add(arrow);
+			reloadTime = RELOAD_TIME;
 		}
-		
-		System.out.println(String.format("%7.2f", Math.toDegrees(angleRadians)));
-		
-		Projectile arrow = new ArrowSprite(centerX, centerY, angleRadians);
-		universe.getSprites().add(arrow);
 	}
 	
 	private boolean checkOverlap(Universe sprites, String targetSprite) {

@@ -17,7 +17,7 @@ public class ArrowSprite implements Projectile{
 	private double velocityX;
 	private double velocityY;
 	
-	private final double RESULTANT_VELOCITY = 200;
+	private final double RESULTANT_VELOCITY = 280;
 	
 	private double angle; //in radians
 	//private static Image[] rotatedImages = new Image[360];
@@ -117,10 +117,11 @@ public class ArrowSprite implements Projectile{
 		this.centerX += movement_x;
 		this.centerY += movement_y;
 		
-		checkWallCollision(universe);
+		checkCollision(universe);
+		checkOverlap(universe, "BarrierSprite");
 	}
 
-	private void checkWallCollision(Universe universe) {
+	private void checkCollision(Universe universe) {
 		for (int i = 0; i < universe.getSprites().size(); i++) {
 			
 			DisplayableSprite sprite = universe.getSprites().get(i);
@@ -137,5 +138,23 @@ public class ArrowSprite implements Projectile{
 				}			
 			}
 		}		
+	}
+	
+	private boolean checkOverlap(Universe sprites, String targetSprite) {
+
+		boolean overlap = false;
+
+		for (DisplayableSprite sprite : sprites.getSprites()) {
+			if (sprite.getClass().toString().contains(targetSprite)) {
+				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
+					if (targetSprite.equals("BarrierSprite")) {
+						this.dispose = true;
+					}
+					overlap = true;
+					break;					
+				}
+			}
+		}		
+		return overlap;		
 	}
 }
