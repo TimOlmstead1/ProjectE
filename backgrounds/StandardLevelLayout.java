@@ -93,6 +93,18 @@ public class StandardLevelLayout implements Background{
 			return 0;
 		}
 	}
+	
+	public ArrayList<DisplayableSprite> getMappedSprites() {
+		ArrayList<DisplayableSprite> sprites = new ArrayList<DisplayableSprite>();
+		for (int row = 0; row < map[0].length; row++) {
+			for (int col = 0; col < map.length; col++) {
+				if (map[col][row] == 4) {
+					sprites.add(new startShrine(row * TILE_WIDTH, col * TILE_HEIGHT, (row + 1) * TILE_WIDTH, (col + 1) * TILE_HEIGHT, true));
+				}
+			}
+		}
+		return sprites;
+	}
 
 	public ArrayList<DisplayableSprite> getOneWayBarriers() {
 		ArrayList<DisplayableSprite> oneWayBarriers = new ArrayList<DisplayableSprite>();

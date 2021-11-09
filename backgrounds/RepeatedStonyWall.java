@@ -78,4 +78,8 @@ public class RepeatedStonyWall implements Background{
 		return null;
 	}
 
+	public ArrayList<DisplayableSprite> getMappedSprites() {
+		return null;
+	}
+
 }

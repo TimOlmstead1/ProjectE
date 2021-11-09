@@ -24,6 +24,7 @@ public interface Universe {
 	
 	public Background getBackground();
 	public Background getForeground();
+	
 	public DisplayableSprite getPlayer1();
 	public boolean centerOnPlayer();
 

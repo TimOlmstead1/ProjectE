@@ -16,5 +16,7 @@ public interface Background {
 	public ArrayList<DisplayableSprite> getOneWayBarriers();
 
 	public ArrayList<DisplayableSprite> getBarriers();
+
+	public ArrayList<DisplayableSprite> getMappedSprites();
 	
 }

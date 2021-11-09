@@ -1,7 +1,7 @@
 import java.awt.MouseInfo;
 import java.util.ArrayList;
 
-public class ShellUniverse implements Universe {
+public class FirstUniverse implements FightingUniverse {
 
 	private boolean complete = false;	
 	private Background background = null;	
@@ -11,14 +11,15 @@ public class ShellUniverse implements Universe {
 	private ArrayList<DisplayableSprite> barriers = new ArrayList<DisplayableSprite>();
 	private ArrayList<DisplayableSprite> oneWayBarriers = new ArrayList<DisplayableSprite>();
 	private ArrayList<DisplayableSprite> disposalList = new ArrayList<DisplayableSprite>();
-
 	
 	private double XCenter = 0;
 	private double YCenter = 0;
 	
 	private double universeScale = 1.7;
 	
-	public ShellUniverse () {
+	private boolean fightStarted = false;
+	
+	public FirstUniverse () {
 
 		this.setXCenter(256);
 		this.setYCenter(208);
@@ -26,16 +27,20 @@ public class ShellUniverse implements Universe {
 		background = new RepeatedStonyWall();
 		foreground = new StandardLevelLayout();
 		
+		ArrayList<DisplayableSprite>  mappedSprites = foreground.getMappedSprites();
+		
 		oneWayBarriers = foreground.getOneWayBarriers();
 		barriers = foreground.getBarriers();
 		
 		foreground.getOneWayBarriers();
 		foreground.getBarriers();
+		foreground.getMappedSprites();
 		
 		player1 = new RangerCharacterSprite(StandardLevelLayout.TILE_HEIGHT * 16, StandardLevelLayout.TILE_WIDTH * 12);
 		sprites.addAll(barriers);
 		sprites.addAll(oneWayBarriers);
 		oneWayBarriers.addAll(barriers);
+		sprites.addAll(mappedSprites);
 		sprites.add(player1);
 	}
 
@@ -137,5 +142,9 @@ public class ShellUniverse implements Universe {
 
 	public String toString() {
 		return "";
+	}
+
+	public void startFight() {
+		fightStarted = true;
 	}
 }

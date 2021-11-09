@@ -126,7 +126,7 @@ public class ArrowSprite implements Projectile{
 			
 			DisplayableSprite sprite = universe.getSprites().get(i);
 			
-			if (sprite instanceof BarrierSprite) {
+			if ((sprite instanceof BarrierSprite)||(sprite instanceof startShrine)) {
 				
 				if (CollisionDetection.pixelBasedOverlaps(this, sprite)){
 					
@@ -134,6 +134,7 @@ public class ArrowSprite implements Projectile{
 						//dispose of arrow
 						this.dispose = true;
 					}
+
 					break;
 				}			
 			}
