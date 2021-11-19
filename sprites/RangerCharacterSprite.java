@@ -51,14 +51,16 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	private int health;
 	
 	public RangerCharacterSprite(double centerX, double centerY, double height, double width) {
-		this(centerX,centerY);
+		this(centerX,centerY, 0);
 		this.height = height;
 		this.width = width;
 	}
 	
-	public RangerCharacterSprite(double centerX, double centerY) {
+	public RangerCharacterSprite(double centerX, double centerY, int startingHelath) {
 		this.centerX = centerX;
 		this.centerY = centerY;
+		
+		health = startingHelath;
 		
 		collisionDetection = new CollisionDetection();
 		bounce = new TwoDimensionBounce();

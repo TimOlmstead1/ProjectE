@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class startShrine implements DisplayableSprite {
+public class StartShrine implements DisplayableSprite {
 
 	private static Image normalImage;
 	private static Image hitImage;
@@ -18,7 +18,7 @@ public class startShrine implements DisplayableSprite {
 	private boolean hasBeenHit = false;
 	private double waitCounter = 50;
 	
-	public startShrine(double minX, double minY, double maxX, double maxY, boolean visible) {
+	public StartShrine(double minX, double minY, double maxX, double maxY, boolean visible) {
 		
 		if (normalImage == null) {
 			try {

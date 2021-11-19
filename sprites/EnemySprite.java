@@ -5,5 +5,7 @@ public interface EnemySprite extends DisplayableSprite{
 	
 	public int getHealth();
 	
-	public void setHealth();
+	public void setHealth(int health);
+	
+	public int getCollisionDamage();
 }

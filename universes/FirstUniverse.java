@@ -18,6 +18,7 @@ public class FirstUniverse implements FightingUniverse {
 	private double universeScale = 1.7;
 	
 	private boolean fightStarted = false;
+	private EnemySprite levelBoss;
 	
 	public FirstUniverse () {
 
@@ -36,12 +37,13 @@ public class FirstUniverse implements FightingUniverse {
 		foreground.getBarriers();
 		foreground.getMappedSprites();
 		
-		player1 = new RangerCharacterSprite(StandardLevelLayout.TILE_HEIGHT * 16, StandardLevelLayout.TILE_WIDTH * 12);
+		player1 = new RangerCharacterSprite(StandardLevelLayout.TILE_HEIGHT * 16, StandardLevelLayout.TILE_WIDTH * 12, 2);
 		sprites.addAll(barriers);
 		sprites.addAll(oneWayBarriers);
 		oneWayBarriers.addAll(barriers);
 		sprites.addAll(mappedSprites);
 		sprites.add(player1);
+
 	}
 
 	public double getScale() {
@@ -145,6 +147,21 @@ public class FirstUniverse implements FightingUniverse {
 	}
 
 	public void startFight() {
+		levelBoss = new VampireBoss(StandardLevelLayout.TILE_HEIGHT * 32, StandardLevelLayout.TILE_WIDTH * 48);
+		sprites.add(new FollowerBatEnemy(StandardLevelLayout.TILE_HEIGHT * 32, StandardLevelLayout.TILE_WIDTH * 48));
+		sprites.add(levelBoss);
 		fightStarted = true;
+	}
+
+	public boolean getIsFightStarted() {
+		return fightStarted;
+	}
+
+	public void setIsFightStarted(boolean isStarted) {
+		fightStarted = isStarted;
+	}
+
+	public EnemySprite getBoss() {
+		return levelBoss;
 	}
 }

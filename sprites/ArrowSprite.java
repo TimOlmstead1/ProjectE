@@ -126,7 +126,7 @@ public class ArrowSprite implements Projectile{
 			
 			DisplayableSprite sprite = universe.getSprites().get(i);
 			
-			if ((sprite instanceof BarrierSprite)||(sprite instanceof startShrine)) {
+			if ((sprite instanceof BarrierSprite)||(sprite instanceof StartShrine)) {
 				
 				if (CollisionDetection.pixelBasedOverlaps(this, sprite)){
 					

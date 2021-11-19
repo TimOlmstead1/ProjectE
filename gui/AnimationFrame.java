@@ -25,6 +25,12 @@ public class AnimationFrame extends JFrame {
 	//point in universe on which the screen will center
 	private double xpFrameCenter = 0;		
 	private double ypFrameCenter = 0;
+	
+	private JLabel[] healthBar = new JLabel[5];
+	private JLabel[] bossBar = new JLabel[10];
+	
+	private int lastCheckedBossHealth = 0;
+	private int lastCheckedPlayerHealth = 0;
 
 	private JPanel panel = null;
 	private JButton btnPauseRun;
@@ -101,44 +107,64 @@ public class AnimationFrame extends JFrame {
 				btnPauseRun_mouseClicked(arg0);
 			}
 		});
+		
+		
+		ImageIcon heartIcon = new ImageIcon("res/hearts/heart.png"); // load the image
+		
+		ImageIcon bossHeartIcon = new ImageIcon("res/hearts/evilHeart.png"); // load the image
 
-		btnPauseRun.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnPauseRun.setBounds(20, 20, 48, 32);
+		for (int i = 0; i < healthBar.length; i++) {
+			healthBar[i] = new JLabel(heartIcon);
+			healthBar[i].setBounds(15, (i*40) + 75, 42, 40);
+			getContentPane().add(healthBar[i]);
+			getContentPane().setComponentZOrder(healthBar[i], 0);
+			healthBar[i].setVisible(false);
+		}
+		for (int i = 0; i < bossBar.length; i++) {
+			bossBar[i] = new JLabel(bossHeartIcon);	
+			bossBar[i].setBounds(SCREEN_WIDTH-15-42, (i*40) + 75, 42, 40);
+			getContentPane().add(bossBar[i]);
+			getContentPane().setComponentZOrder(bossBar[i], 0);
+			bossBar[i].setVisible(false);
+		}
+
+		btnPauseRun.setFont(new Font("Optima", Font.BOLD, 12));
+		btnPauseRun.setBounds(15, 20, 48, 32);
 		btnPauseRun.setFocusable(false);
 		getContentPane().add(btnPauseRun);
 		getContentPane().setComponentZOrder(btnPauseRun, 0);
 
 		lblTimeLabel = new JLabel("Time: ");
 		lblTimeLabel.setForeground(Color.YELLOW);
-		lblTimeLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblTimeLabel.setFont(new Font("Optima", Font.BOLD, 30));
 		lblTimeLabel.setBounds(80, 22, 96, 30);
 		getContentPane().add(lblTimeLabel);
 		getContentPane().setComponentZOrder(lblTimeLabel, 0);
 
 		lblTime = new JLabel("000");
 		lblTime.setForeground(Color.YELLOW);
-		lblTime.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblTime.setFont(new Font("Optima", Font.BOLD, 30));
 		lblTime.setBounds(192, 22, 320, 30);
 		getContentPane().add(lblTime);
 		getContentPane().setComponentZOrder(lblTime, 0);
 
 		lblLevelLabel = new JLabel("Level: ");
 		lblLevelLabel.setForeground(Color.YELLOW);
-		lblLevelLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblLevelLabel.setFont(new Font("Optima", Font.BOLD, 30));
 		lblLevelLabel.setBounds(528, 22, 128, 30);
 		getContentPane().add(lblLevelLabel);
 		getContentPane().setComponentZOrder(lblLevelLabel, 0);
 
 		lblLevel = new JLabel("1");
 		lblLevel.setForeground(Color.YELLOW);
-		lblLevel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblLevel.setFont(new Font("Optima", Font.BOLD, 30));
 		lblLevel.setBounds(672, 22, 48, 30);
 		getContentPane().add(lblLevel);
 		getContentPane().setComponentZOrder(lblLevel, 0);
 
 		lblStatus = new JLabel("Status");
 		lblStatus.setForeground(Color.WHITE);
-		lblStatus.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblStatus.setFont(new Font("Optima", Font.BOLD, 30));
 		lblStatus.setBounds(0, SCREEN_HEIGHT - 30 - 16, SCREEN_WIDTH, 36);
 		getContentPane().add(lblStatus);
 		getContentPane().setComponentZOrder(lblStatus, 0);
@@ -237,7 +263,40 @@ public class AnimationFrame extends JFrame {
 		if (universe != null) {
 			this.lblStatus.setText(universe.toString());
 		}
-
+		
+		if (universe instanceof FightingUniverse) {
+			int health = ((RangerCharacterSprite)universe.getPlayer1()).getHealth();
+			if (!(health == lastCheckedPlayerHealth)) {
+			
+				lastCheckedPlayerHealth = health;
+						
+				for (int i = 0; i < healthBar.length; i++) {
+					healthBar[i].setVisible(false);
+				}
+				for (int i = 0; i < health; i++) {
+					healthBar[i].setVisible(true);
+				}
+			}
+			
+			if (((FightingUniverse) universe).getIsFightStarted()) {
+				try {
+					int bossHealth = ((FightingUniverse) universe).getBoss().getHealth();
+					if (!(bossHealth == lastCheckedBossHealth)) {
+						
+						lastCheckedBossHealth = bossHealth;
+						
+						for (int i = 0; i < bossBar.length; i++) {
+							bossBar[i].setVisible(false);
+						}
+						for (int i = 0; i < bossHealth; i++) {
+							bossBar[i].setVisible(true);
+						}
+					}
+				}
+				catch (NullPointerException e){ //for when the boss reaches 0 health and is disposed of
+				}			
+			}
+		}
 	}
 
 	private void updateTime() {
