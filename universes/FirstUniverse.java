@@ -147,8 +147,10 @@ public class FirstUniverse implements FightingUniverse {
 	}
 
 	public void startFight() {
-		levelBoss = new VampireBoss(StandardLevelLayout.TILE_HEIGHT * 32, StandardLevelLayout.TILE_WIDTH * 48);
-		sprites.add(new FollowerBatEnemy(StandardLevelLayout.TILE_HEIGHT * 32, StandardLevelLayout.TILE_WIDTH * 48));
+		levelBoss = new VampireBoss(StandardLevelLayout.TILE_WIDTH * 32, StandardLevelLayout.TILE_HEIGHT * 47);
+		sprites.add(new FollowerBatEnemy(StandardLevelLayout.TILE_WIDTH * 32, StandardLevelLayout.TILE_HEIGHT * 48));
+		sprites.add(new FollowerBatEnemy(StandardLevelLayout.TILE_WIDTH * 28, StandardLevelLayout.TILE_HEIGHT * 48));
+		sprites.add(new FollowerBatEnemy(StandardLevelLayout.TILE_WIDTH * 36, StandardLevelLayout.TILE_HEIGHT * 48));
 		sprites.add(levelBoss);
 		fightStarted = true;
 	}

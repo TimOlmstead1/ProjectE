@@ -16,7 +16,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	private final double FRICTION_FACTOR_X = 0.90; 
 	private final double INITIAL_JUMP_VELOCITY = 320; //pixels / second
 	
-	private final double RELOAD_TIME = 500;
+	private final double RELOAD_TIME = 400;
 	
 	private Universe currentUniverse = null;
 	
@@ -49,7 +49,11 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	private boolean shooting = false;
 	
 	private int health;
-	
+	private DisplayableSprite overlappingSprite;
+	private boolean beenHit = false;
+	private double invinsibilityTimer = 0;
+	private double flickerAnimation = 0;
+
 	public RangerCharacterSprite(double centerX, double centerY, double height, double width) {
 		this(centerX,centerY, 0);
 		this.height = height;
@@ -94,6 +98,18 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	}
 
 	public Image getImage() {
+		if (beenHit) {	
+			if (flickerAnimation <= 10) {
+				flickerAnimation++;
+				return rangerSprites[16];
+			}
+			else if (flickerAnimation >= 30) {
+				flickerAnimation = 0;
+			}
+			else {
+				flickerAnimation++;
+			}
+		}
 		if (shooting) {
 			if (((centerX - currentUniverse.getXCenter()) < convertedMouseX)){
 				if (animationCount <= 10) {
@@ -169,7 +185,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 			}
 		}
 		
-		if (velocityY > 1){
+		else if (velocityY > 1){
 			if (wasTravelingRight){
 				return rangerSprites[76];
 			}
@@ -313,6 +329,21 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
 	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 		
+		if (invinsibilityTimer <= 0) {
+			beenHit = false;
+			if (checkOverlapEnemies(universe)) {
+				try {
+					checkPixelCollision(universe, overlappingSprite);
+				}
+				catch(Exception ImageOutOfBoundsException){
+				//if at first you don't succeed try try try again
+				}
+			}
+		}
+		else {
+			invinsibilityTimer--;
+		}
+		
 		if (currentUniverse == null) {
 			currentUniverse = universe;
 		}
@@ -422,7 +453,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		}
 	}
 	
-	private boolean checkOverlap(Universe sprites, String targetSprite) {
+	private boolean checkOverlapClass(Universe sprites, String targetSprite) {
 
 		boolean overlap = false;
 
@@ -436,6 +467,35 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		}		
 		return overlap;		
 	}
+	
+	private boolean checkOverlapEnemies(Universe sprites) {
+
+		boolean overlap = false;
+
+		for (DisplayableSprite sprite : sprites.getSprites()) {
+			if (sprite instanceof EnemySprite) {
+				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
+					overlap = true;
+					overlappingSprite = sprite;
+					break;					
+				}
+			}
+		}		
+		return overlap;		
+	}
+	
+	private void checkPixelCollision(Universe universe, DisplayableSprite sprite) {
+		if ((sprite instanceof EnemySprite)) {
+			
+			if (CollisionDetection.pixelBasedOverlaps(this, sprite)){
+				
+				health = health - ((EnemySprite) sprite).getCollisionDamage();
+				beenHit = true;
+				invinsibilityTimer = 120;
+			}			
+		}		
+	}
+	
 	
 	private boolean isOnGround(Universe universe) {
 		boolean onGround = false;

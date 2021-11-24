@@ -79,10 +79,32 @@ public class FollowerBatEnemy implements EnemySprite, MovableSprite{
 			
 		}
 		else if (velocityX < 0) {
-			return imageList[11];
+			if (animationCount <= 20) {
+				animationCount++;
+				return imageList[3];
+			}
+			else if (animationCount <= 60) {
+				animationCount++;
+				return imageList[7];
+			}
+			else if (animationCount <= 100) {
+				animationCount = 0;
+				return imageList[11];
+			}
 		}
 		else if (velocityX == 0) {
-			return imageList[8];
+			if (animationCount <= 20) {
+				animationCount++;
+				return imageList[4];
+			}
+			else if (animationCount <= 60) {
+				animationCount++;
+				return imageList[8];
+			}
+			else if (animationCount <= 100) {
+				animationCount = 0;
+				return imageList[12];
+			}
 		}
 		return imageList[8];
 	}
@@ -137,7 +159,7 @@ public class FollowerBatEnemy implements EnemySprite, MovableSprite{
 	}
 
 	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
-		if (health <= 0) {
+		if ((health <= 0)||((FightingUniverse) universe).getIsFightStarted() == false) {
 			this.dispose = true;
 		}
 		
