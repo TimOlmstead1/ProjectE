@@ -3,48 +3,41 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class ArrowSprite implements Projectile{
+public class BloodProjectile implements EnemyProjectile{
 	
 	private static final int WIDTH = 8;
 	private static final int HEIGHT = 8;
 	
 	private double centerX;
 	private double centerY;
-	private double width;
-	private double height;
+	private double width = 8;
+	private double height = 8;
 	private boolean dispose = false;
 	
 	private double velocityX;
 	private double velocityY;
 	
-	private final double RESULTANT_VELOCITY = 280;
+	private final double RESULTANT_VELOCITY = 180;
 	
 	private double angle; //in radians
-	//private static Image[] rotatedImages = new Image[360];
 	private static Image image = null;
 	
 	private int damage = 1;
 	
-	public ArrowSprite(double centerX, double centerY, double angle) {
+	public BloodProjectile(double centerX, double centerY, double angle) {
 		this.centerX = centerX;
 		this.centerY = centerY;
 		this.angle = angle;
 		
 		if (image == null) {
 			try {
-				image = ImageIO.read(new File("res/ArrowBall.png"));
+				image = ImageIO.read(new File("res/BloodBall.png"));
 			}
 			catch (IOException e) {
 				System.out.print(e.toString());
 			}
-			
-//			if (image != null) {
-//				for (int i = 0; i < 360; i++) {
-//					rotatedImages[i] = ImageRotator.rotate(image, i);			
-//				}
-//			}
 		}
-		this.width =  WIDTH;
+		this.width = WIDTH;
 		this.height = HEIGHT;
 		
 		velocityX = Math.cos(angle)*(RESULTANT_VELOCITY);
@@ -52,12 +45,6 @@ public class ArrowSprite implements Projectile{
 	}
 
 	public Image getImage() {
-//		if ((int)Math.toDegrees(angle) >= 0) {
-//			return rotatedImages[((int)Math.toDegrees(angle))];
-//		}
-//		else {
-//			return rotatedImages[(360+((int)Math.toDegrees(angle)))];
-//		}
 		return image;
 	}
 
@@ -119,7 +106,7 @@ public class ArrowSprite implements Projectile{
 		
 		checkOverlap(universe, "BarrierSprite");
 	}
-
+	
 	private boolean checkOverlap(Universe sprites, String targetSprite) {
 
 		boolean overlap = false;

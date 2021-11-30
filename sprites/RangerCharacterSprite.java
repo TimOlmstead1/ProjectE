@@ -16,7 +16,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	private final double FRICTION_FACTOR_X = 0.90; 
 	private final double INITIAL_JUMP_VELOCITY = 320; //pixels / second
 	
-	private final double RELOAD_TIME = 400;
+	private final double RELOAD_TIME = 350;
 	
 	private Universe currentUniverse = null;
 	
@@ -331,7 +331,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		
 		if (invinsibilityTimer <= 0) {
 			beenHit = false;
-			if (checkOverlapEnemies(universe)) {
+			if (checkOverlap(universe)) {
 				try {
 					checkPixelCollision(universe, overlappingSprite);
 				}
@@ -453,27 +453,12 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		}
 	}
 	
-	private boolean checkOverlapClass(Universe sprites, String targetSprite) {
+	private boolean checkOverlap(Universe sprites) {
 
 		boolean overlap = false;
 
 		for (DisplayableSprite sprite : sprites.getSprites()) {
-			if (sprite.getClass().toString().contains(targetSprite)) {
-				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
-					overlap = true;
-					break;					
-				}
-			}
-		}		
-		return overlap;		
-	}
-	
-	private boolean checkOverlapEnemies(Universe sprites) {
-
-		boolean overlap = false;
-
-		for (DisplayableSprite sprite : sprites.getSprites()) {
-			if (sprite instanceof EnemySprite) {
+			if ((sprite instanceof EnemySprite)||(sprite instanceof EnemyProjectile)) {
 				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
 					overlap = true;
 					overlappingSprite = sprite;
@@ -485,13 +470,21 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	}
 	
 	private void checkPixelCollision(Universe universe, DisplayableSprite sprite) {
-		if ((sprite instanceof EnemySprite)) {
+		if ((sprite instanceof EnemySprite)||(sprite instanceof EnemyProjectile))  {
 			
 			if (CollisionDetection.pixelBasedOverlaps(this, sprite)){
 				
-				health = health - ((EnemySprite) sprite).getCollisionDamage();
-				beenHit = true;
-				invinsibilityTimer = 120;
+				if (sprite instanceof EnemySprite) {
+					health = health - ((EnemySprite) sprite).getCollisionDamage();
+					beenHit = true;
+					invinsibilityTimer = 120;
+				}
+				else if (sprite instanceof EnemyProjectile) {
+					health = health - ((EnemyProjectile) sprite).getDamageGiven();
+					((Projectile) sprite).setDispose();
+					beenHit = true;
+					invinsibilityTimer = 120;
+				}
 			}			
 		}		
 	}

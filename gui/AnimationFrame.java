@@ -326,12 +326,6 @@ public class AnimationFrame extends JFrame {
 		if (keyboard.keyDown(79) && isPaused ) {
 			btnPauseRun_mouseClicked(null);
 		}
-		if (keyboard.keyDown(112)) {
-			scale *= 1.01;
-		}
-		if (keyboard.keyDown(113)) {
-			scale /= 1.01;
-		}
 		if (keyboard.keyDownOnce(27)) {
 			mouse.setRelative(false);
 		}

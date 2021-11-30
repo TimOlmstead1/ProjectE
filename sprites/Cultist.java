@@ -28,12 +28,15 @@ public class Cultist implements EnemySprite, MovableSprite{
 	
 	private static Image cultist = null;
 	private static Image cultistSpawning = null;
+	private static Image cultistRight = null;
+	private static Image cultistSpawningRight = null;
 	
 	private int health;
 	private boolean isSpawning = false;
 	private double animationCount = Math.random()*(399);
 	private boolean regularBatAdded = false;
 	private DisplayableSprite overlappingSprite;
+	private boolean playerIsToTheRight = false;
 
 	public Cultist(double centerX, double centerY) {
 		this.centerX = centerX;
@@ -50,6 +53,8 @@ public class Cultist implements EnemySprite, MovableSprite{
 			try {
 				cultist = ImageIO.read(new File("res/cultistEnemy/cultist2.png"));
 				cultistSpawning = ImageIO.read(new File("res/cultistEnemy/cultist1.png"));
+				cultistRight = ImageIO.read(new File("res/cultistEnemy/cultist4.png"));
+				cultistSpawningRight = ImageIO.read(new File("res/cultistEnemy/cultist3.png"));
 			}
 			catch (IOException e) {
 				System.out.print(e.toString());
@@ -58,8 +63,17 @@ public class Cultist implements EnemySprite, MovableSprite{
 	}
 
 	public Image getImage() {
-		if (isSpawning) {
-			return cultistSpawning;
+		
+		if (playerIsToTheRight) {
+			if (isSpawning) {
+				return cultistSpawningRight;
+			}
+			return cultistRight;
+		}
+		else {
+			if (isSpawning) {
+				return cultistSpawning;
+			}
 		}
 		return cultist;
 	}
@@ -139,6 +153,13 @@ public class Cultist implements EnemySprite, MovableSprite{
 		
 		if ((health <= 0)||((FightingUniverse) universe).getIsFightStarted() == false) {
 			this.dispose = true;
+		}
+		
+		if (universe.getPlayer1().getCenterX() > centerX) {
+			playerIsToTheRight = true;
+		}
+		else {
+			playerIsToTheRight = false;
 		}
 	
 		if (checkOverlapArrows(universe)) {
@@ -223,7 +244,7 @@ public class Cultist implements EnemySprite, MovableSprite{
 		this.dispose = true;
 	}
 
-	public int getCollisionDamage() {
-		return 1;
+	public int getCollisionDamage() { //running into a cultist does not harm you
+		return 0;
 	}
 }

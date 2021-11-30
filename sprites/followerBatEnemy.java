@@ -8,7 +8,7 @@ public class FollowerBatEnemy implements EnemySprite, MovableSprite{
 	
 	private static final int WIDTH = 32;
 	private static final int HEIGHT = 32;
-	private static final double RESULTANT_VELOCITY = 90;
+	private static final double RESULTANT_VELOCITY = 80;
 	
 	private double centerX;
 	private double centerY;

@@ -37,7 +37,7 @@ public class FirstUniverse implements FightingUniverse {
 		foreground.getBarriers();
 		foreground.getMappedSprites();
 		
-		player1 = new RangerCharacterSprite(StandardLevelLayout.TILE_HEIGHT * 16, StandardLevelLayout.TILE_WIDTH * 12, 2);
+		player1 = new RangerCharacterSprite(StandardLevelLayout.TILE_HEIGHT * 16, StandardLevelLayout.TILE_WIDTH * 12, 3);
 		sprites.addAll(barriers);
 		sprites.addAll(oneWayBarriers);
 		oneWayBarriers.addAll(barriers);
