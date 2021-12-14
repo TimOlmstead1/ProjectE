@@ -409,28 +409,28 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 			
 			// Jump
 			if (onGround) {
-				if (keyboard.keyDown(38)) {
+				if ((keyboard.keyDown(38))||(keyboard.keyDown(87))) {
 					isJumping = true;
 					this.velocityY -= INITIAL_JUMP_VELOCITY;
 					onGround = false;
 				}
 			}
 			// RIGHT
-			if (keyboard.keyDown(39)) {
+			if ((keyboard.keyDown(39))||(keyboard.keyDown(68))) {
 				velocityX += xMoveSpeed;
 				if (velocityX > MAX_VELOCITY_X) {
 					velocityX = MAX_VELOCITY_X;
 				}
 			}
 			// LEFT
-			if (keyboard.keyDown(37)) {
+			if ((keyboard.keyDown(37))||(keyboard.keyDown(65))) {
 				velocityX -= xMoveSpeed;
 				if (velocityX < - MAX_VELOCITY_X) {
 					velocityX = - MAX_VELOCITY_X;
 				}
 			}
 			// DOWN
-			if (keyboard.keyDown(40)) {
+			if ((keyboard.keyDown(40))||(keyboard.keyDown(83))) {
 				velocityY += ACCCELERATION_Y/60;
 				if (velocityY < - MAX_VELOCITY_Y) {
 					velocityY = - MAX_VELOCITY_Y;
@@ -443,7 +443,7 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 				collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
 			}
 			else if(velocityY >= 0) {
-				if (keyboard.keyDown(40)){
+				if ((keyboard.keyDown(40))||(keyboard.keyDown(83))){
 					collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
 				}
 				else {

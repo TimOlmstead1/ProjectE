@@ -41,6 +41,8 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 	
 	private int deathAnimation = 0; //0 is not started, 1 is started, and 2 is complete
 	private double deathAnimationCounter = 0;
+	
+	private boolean playerIsToTheRight = false;
 
 	public SnakeBoss(double centerX, double centerY) {
 		this.centerX = centerX;
@@ -51,7 +53,7 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 		health = 4;
 		
 		try {
-			snakeSprites = new Image[4];
+			snakeSprites = new Image[8];
 			for (int i = 1; i <= snakeSprites.length; i++) {
 				String path = String.format("res/greenBoss/snakeBoss%d.png", i);
 				snakeSprites[i-1] = ImageIO.read(new File(path));
@@ -66,28 +68,28 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 		if (deathAnimation == 1) {
 			if (deathAnimationCounter <= 80) {
 				deathAnimationCounter++;
-				return snakeSprites[4];
+				return snakeSprites[9];
 			}
 			else if (deathAnimationCounter <= 160) {
 				deathAnimationCounter++;
-				return snakeSprites[5];
+				return snakeSprites[10];
 			}
 			else if (deathAnimationCounter <= 320) {
 				deathAnimationCounter++;
-				return snakeSprites[6];
+				return snakeSprites[11];
 			}
 			else if (deathAnimationCounter <= 480) {
 				deathAnimationCounter++;
-				return snakeSprites[7];
+				return snakeSprites[12];
 			}
 			else {
 				deathAnimation = 2;
 			}
 		}
 		else if (deathAnimation == 2) {
-			return snakeSprites[7];
+			return snakeSprites[12];
 		}	
-		else {
+		else if (playerIsToTheRight){
 			if (animationCount <= 30) {
 				animationCount++;
 				return snakeSprites[0];
@@ -99,6 +101,20 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 			else {
 				animationCount = 0;
 				return snakeSprites[0]; 
+			}
+		}
+		else {
+			if (animationCount <= 30) {
+				animationCount++;
+				return snakeSprites[4];
+			}
+			else if (animationCount <= 60){
+				animationCount++;
+				return snakeSprites[7];
+			}
+			else {
+				animationCount = 0;
+				return snakeSprites[4]; 
 			}
 		}
 		return snakeSprites[0]; 
@@ -185,6 +201,13 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 			deathAnimation = 1;
 		}
 		else {
+			
+			if (universe.getPlayer1().getCenterX() > centerX) {
+				playerIsToTheRight = true;
+			}
+			else {
+				playerIsToTheRight = false;
+			}
 			
 			timeAlive = timeAlive + (actual_delta_time*0.01);
 			
