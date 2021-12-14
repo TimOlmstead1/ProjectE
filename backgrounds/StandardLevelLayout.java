@@ -99,7 +99,7 @@ public class StandardLevelLayout implements Background{
 		for (int row = 0; row < map[0].length; row++) {
 			for (int col = 0; col < map.length; col++) {
 				if (map[col][row] == 4) {
-					sprites.add(new StartShrine(row * TILE_WIDTH, col * TILE_HEIGHT, (row + 1) * TILE_WIDTH, (col + 1) * TILE_HEIGHT, true));
+					sprites.add(new startShrine(row * TILE_WIDTH, col * TILE_HEIGHT, (row + 1) * TILE_WIDTH, (col + 1) * TILE_HEIGHT, true));
 				}
 			}
 		}

@@ -98,6 +98,10 @@ public class BloodProjectile implements EnemyProjectile{
 	}
 
 	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
+		if (((FightingUniverse) universe).getIsFightStarted() == false) {
+			this.dispose = true;
+		}
+		
 		double movement_x = (this.velocityX * actual_delta_time * 0.001);
 		double movement_y = (this.velocityY * actual_delta_time * 0.001);
 		    

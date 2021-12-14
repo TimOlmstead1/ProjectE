@@ -19,6 +19,8 @@ public class ArrowSprite implements Projectile{
 	
 	private final double RESULTANT_VELOCITY = 280;
 	
+	private CollisionDetection collisionDetection;
+	
 	private double angle; //in radians
 	//private static Image[] rotatedImages = new Image[360];
 	private static Image image = null;
@@ -26,6 +28,9 @@ public class ArrowSprite implements Projectile{
 	private int damage = 1;
 	
 	public ArrowSprite(double centerX, double centerY, double angle) {
+		
+		collisionDetection = new CollisionDetection();
+		
 		this.centerX = centerX;
 		this.centerY = centerY;
 		this.angle = angle;

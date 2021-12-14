@@ -252,7 +252,7 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 			
 			if ((timeAlive%50 < 1)&&(!(regularBatAdded))) {
 				regularBatAdded = true;
-				universe.getSprites().add(new FollowerBatEnemy(centerX, centerY));
+				universe.getSprites().add(new followerBatEnemy(centerX, centerY));
 				fireInCircle(universe);
 			}
 			else if ((timeAlive%50 > 1)&&(timeAlive%50 < 2)){
@@ -309,10 +309,10 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 			
 			if (beenHit && (health > 0)) {
 				move(universe);
-				universe.getSprites().add(new FollowerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 1));
-				universe.getSprites().add(new FollowerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 48));
-				universe.getSprites().add(new FollowerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 48));
-				universe.getSprites().add(new FollowerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 1));
+				universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 1));
+				universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 48));
+				universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 48));
+				universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 1));
 				beenHit = false;
 			}
 			else if ((timeAlive >= timeLastMoved + 90)){

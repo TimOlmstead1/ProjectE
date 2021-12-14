@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class FollowerBatEnemy implements EnemySprite, MovableSprite{
+public class followerBatEnemy implements EnemySprite, MovableSprite{
 	
 	private static final int WIDTH = 32;
 	private static final int HEIGHT = 32;
-	private static final double RESULTANT_VELOCITY = 80;
+	private static final double RESULTANT_VELOCITY = 90;
 	
 	private double centerX;
 	private double centerY;
@@ -28,7 +28,7 @@ public class FollowerBatEnemy implements EnemySprite, MovableSprite{
 	private int damage = 1;
 	private int health = 1;
 	
-	public FollowerBatEnemy(double centerX, double centerY) {
+	public followerBatEnemy(double centerX, double centerY) {
 		
 		this.centerX = centerX;
 		this.centerY = centerY;

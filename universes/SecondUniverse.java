@@ -1,7 +1,7 @@
 import java.awt.MouseInfo;
 import java.util.ArrayList;
 
-public class FirstUniverse implements FightingUniverse {
+public class SecondUniverse implements FightingUniverse {
 
 	private boolean complete = false;	
 	private Background background = null;	
@@ -21,12 +21,12 @@ public class FirstUniverse implements FightingUniverse {
 	private boolean fightOver = false;
 	private EnemySprite levelBoss;
 	
-	public FirstUniverse () {
+	public SecondUniverse () {
 
 		this.setXCenter(256);
 		this.setYCenter(208);
 		
-		background = new RepeatedStonyWall(1);
+		background = new RepeatedStonyWall(2);
 		foreground = new StandardLevelLayout();
 		
 		ArrayList<DisplayableSprite>  mappedSprites = foreground.getMappedSprites();
@@ -148,10 +148,9 @@ public class FirstUniverse implements FightingUniverse {
 	}
 
 	public void startFight() {
-		levelBoss = new VampireBoss(StandardLevelLayout.TILE_WIDTH * 32, StandardLevelLayout.TILE_HEIGHT * 47);
-		sprites.add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 32, StandardLevelLayout.TILE_HEIGHT * 48));
-		sprites.add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 28, StandardLevelLayout.TILE_HEIGHT * 48));
-		sprites.add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 36, StandardLevelLayout.TILE_HEIGHT * 48));
+		levelBoss = new SnakeBoss(StandardLevelLayout.TILE_WIDTH * 32, StandardLevelLayout.TILE_HEIGHT * 47);
+		sprites.add(new Turtle(StandardLevelLayout.TILE_WIDTH * 5, StandardLevelLayout.TILE_HEIGHT * 14));
+		sprites.add(new Turtle(StandardLevelLayout.TILE_WIDTH * 59, StandardLevelLayout.TILE_HEIGHT * 33));
 		sprites.add(levelBoss);
 		fightStarted = true;
 	}
@@ -175,7 +174,7 @@ public class FirstUniverse implements FightingUniverse {
 	public void setIsFightOver(boolean isOver) {
 		fightOver = isOver;
 	}
-	
+
 	public boolean getIsFightOver() {
 		return fightOver;
 	}

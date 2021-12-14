@@ -5,31 +5,22 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-public class RepeatedStonyWall implements Background{
+public class TitleBackground implements Background{
 	
 	private int backgroundWidth = 0;
  	private int backgroundHeight = 0;
 
-    private Image wall =null;
+    private Image image = null;
 	
-    public RepeatedStonyWall(int wallType) { //1 is Stony, 2 is Viney
-    	Image stonyWall = null;
-    	Image vineyWall = null;
+    public TitleBackground() {
     	try {
-    		stonyWall = ImageIO.read(new File("res/MapElements/Stony Wall(64x64).png"));
-    		vineyWall = ImageIO.read(new File("res/MapElements/Vine Wall(64x64).png"));
+    		this.image = ImageIO.read(new File("res/MapElements/titleScreen.png"));
     	}
     	catch (IOException e) {
     		System.out.println(e.toString());
     	}
-    	if (wallType == 1) {
-    		wall = stonyWall;
-    	}
-    	else {
-    		wall = vineyWall;
-    	}
-    	backgroundWidth = wall.getWidth(null);
-		backgroundHeight = wall.getHeight(null);
+    	backgroundWidth = image.getWidth(null);
+		backgroundHeight = image.getHeight(null);
     }
     
 	public Tile getTile(int col, int row) {
@@ -37,7 +28,7 @@ public class RepeatedStonyWall implements Background{
 		int y = (row * backgroundHeight);
 		Tile newTile = null;
 		
-		newTile = new Tile(wall, x, y, backgroundWidth, backgroundHeight, false);
+		newTile = new Tile(image, x, y, backgroundWidth, backgroundHeight, false);
 
 		return newTile;
 	}

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-public class Cultist implements EnemySprite, MovableSprite{
+public class Turtle implements EnemySprite, MovableSprite{
 	
 	private final double ACCCELERATION_Y = 600; 	//PIXELS PER SECOND PER SECOND
 
@@ -17,44 +17,41 @@ public class Cultist implements EnemySprite, MovableSprite{
 	private boolean visible = true;
 	private double centerX = 0;
 	private double centerY = 0;
+	private double speed = 0;
 	
-	private double width = 24;  //59
-	private double height = 35; //87
-	
+	private double width = 41;  
+	private double height = 21; 
+
 	private boolean dispose = false;
 	
 	private CollisionDetection collisionDetection;
 	TwoDimensionBounce bounce;
 	
-	private static Image cultist = null;
-	private static Image cultistSpawning = null;
-	private static Image cultistRight = null;
-	private static Image cultistSpawningRight = null;
-	
-	private int health;
-	private boolean isSpawning = false;
-	private double animationCount = Math.random()*(399);
-	private boolean regularBatAdded = false;
-	private DisplayableSprite overlappingSprite;
-	private boolean playerIsToTheRight = false;
+	private static Image[] turtleImages = new Image[8];
 
-	public Cultist(double centerX, double centerY) {
+	private int health;
+	private double animationCount = 0;
+	private DisplayableSprite overlappingSprite;
+	
+	private boolean travellingRight = false;
+
+	public Turtle(double centerX, double centerY) {
 		this.centerX = centerX;
 		this.centerY = centerY;
 		
-		health = 1;
+		health = 1000;  //needs to be an enemy but essentially cannot be killed
 		
 		collisionDetection = new CollisionDetection();
 		bounce = new TwoDimensionBounce();
 		collisionDetection.setBounceFactorX(0);
 		collisionDetection.setBounceFactorY(0);
 	
-		if (cultist == null) {
+		if (turtleImages[0] == null) {
 			try {
-				cultist = ImageIO.read(new File("res/cultistEnemy/cultist2.png"));
-				cultistSpawning = ImageIO.read(new File("res/cultistEnemy/cultist1.png"));
-				cultistRight = ImageIO.read(new File("res/cultistEnemy/cultist4.png"));
-				cultistSpawningRight = ImageIO.read(new File("res/cultistEnemy/cultist3.png"));
+				for (int i = 1; i <= turtleImages.length; i++) {
+					String path = String.format("res/turtleEnemy/turtle%d.png", i);
+					turtleImages[i-1] = ImageIO.read(new File(path));
+				}
 			}
 			catch (IOException e) {
 				System.out.print(e.toString());
@@ -63,19 +60,44 @@ public class Cultist implements EnemySprite, MovableSprite{
 	}
 
 	public Image getImage() {
-		
-		if (playerIsToTheRight) {
-			if (isSpawning) {
-				return cultistSpawningRight;
+		if (travellingRight) {
+			if (animationCount <= 30) {
+				animationCount++;
+				return turtleImages[0];
+			}else if (animationCount <= 60){
+				animationCount++;
+				return turtleImages[1];
+			}else if (animationCount <= 90){
+				animationCount++;
+				return turtleImages[2];
+			}else if (animationCount <= 120){
+				animationCount++;
+				return turtleImages[3];
 			}
-			return cultistRight;
+			else {
+				animationCount = 0;
+				return turtleImages[3];
+			}
 		}
 		else {
-			if (isSpawning) {
-				return cultistSpawning;
+			if (animationCount <= 30) {
+				animationCount++;
+				return turtleImages[4];
+			}else if (animationCount <= 60){
+				animationCount++;
+				return turtleImages[5];
+			}else if (animationCount <= 90){
+				animationCount++;
+				return turtleImages[6];
+			}else if (animationCount <= 120){
+				animationCount++;
+				return turtleImages[7];
+			}
+			else {
+				animationCount = 0;
+				return turtleImages[7];
 			}
 		}
-		return cultist;
 	}
 
 	public boolean getVisible() {
@@ -155,19 +177,12 @@ public class Cultist implements EnemySprite, MovableSprite{
 			this.dispose = true;
 		}
 		
-		if (universe.getPlayer1().getCenterX() > centerX) {
-			playerIsToTheRight = true;
-		}
-		else {
-			playerIsToTheRight = false;
-		}
-	
-		if (checkOverlapArrows(universe)) {
+		if (checkOverlap(universe)) {
 			try {
 				checkPixelCollision(universe, overlappingSprite);
 			}
 			catch(Exception ImageOutOfBoundsException){
-			//if at first you don't succeed try try try again
+			//if at first you don't succeed try try try again   //actually figured out why this didn't work, the arrows needed to have their own collision detection as well 
 			}
 		}
 		
@@ -189,23 +204,38 @@ public class Cultist implements EnemySprite, MovableSprite{
 		}
 		onGround = isOnGround(universe);
 		
-		if ((animationCount >= 400)&&(!(regularBatAdded))) {
-			regularBatAdded = true;
-			universe.getSprites().add(new followerBatEnemy(centerX, centerY));
-			isSpawning = true;
-		}	
-		else if (animationCount >= 500){
-			animationCount = 0;
-			isSpawning = false;
-			regularBatAdded = false;
+		//
+		
+		if (checkOverlap(universe)) {
+			if (overlappingSprite instanceof BarrierSprite) {
+				if (travellingRight) {
+					travellingRight = false;
+				}
+				else {
+					travellingRight = true;
+				}
+			}
+		}
+		if ((universe.getPlayer1().getCenterY() <= centerY+15)&&(universe.getPlayer1().getCenterY() >= centerY-15)) {
+			speed = 3;
+		}
+		else {
+			speed = 2;
+		}
+		
+		if (travellingRight) {
+			centerX = centerX + speed;
+		}
+		else {
+			centerX = centerX - speed;
 		}
 	}
-	private boolean checkOverlapArrows(Universe sprites) {
+	private boolean checkOverlap(Universe sprites) {
 
 		boolean overlap = false;
 
 		for (DisplayableSprite sprite : sprites.getSprites()) {
-			if (sprite instanceof ArrowSprite) {
+			if ((sprite instanceof ArrowSprite)||(sprite instanceof BarrierSprite)) {
 				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
 					overlap = true;
 					overlappingSprite = sprite;
@@ -245,6 +275,6 @@ public class Cultist implements EnemySprite, MovableSprite{
 	}
 
 	public int getCollisionDamage() { //running into a cultist does not harm you
-		return 0;
+		return 1;
 	}
 }

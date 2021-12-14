@@ -9,14 +9,16 @@ import javax.imageio.ImageIO;
 
 public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
-	private final double ACCCELERATION_X = 15;		//PIXELS PER SECOND PER SECOND
 	private final double ACCCELERATION_Y = 600; 	//PIXELS PER SECOND PER SECOND
 	private final double MAX_VELOCITY_X = 600;	//PIXELS PER SECOND
 	private final double MAX_VELOCITY_Y = 400;
 	private final double FRICTION_FACTOR_X = 0.90; 
 	private final double INITIAL_JUMP_VELOCITY = 320; //pixels / second
 	
-	private final double RELOAD_TIME = 350;
+	//upgradable
+	static int reloadTime = 0;
+	static int startingHealth = 0;
+	static double xMoveSpeed = 0;
 	
 	private Universe currentUniverse = null;
 	
@@ -45,26 +47,34 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
 	private double convertedMouseX;
 	private double convertedMouseY;
-	private double reloadTime = 0;
+	private boolean hasShot = false;
 	private boolean shooting = false;
 	
 	private int health;
+	private boolean isDead = false;
+	private boolean isDying = false;
 	private DisplayableSprite overlappingSprite;
 	private boolean beenHit = false;
 	private double invinsibilityTimer = 0;
 	private double flickerAnimation = 0;
 
 	public RangerCharacterSprite(double centerX, double centerY, double height, double width) {
-		this(centerX,centerY, 0);
+		this(centerX,centerY);
 		this.height = height;
 		this.width = width;
 	}
 	
-	public RangerCharacterSprite(double centerX, double centerY, int startingHelath) {
+	public RangerCharacterSprite(double centerX, double centerY) {
+		
+		if (xMoveSpeed == 0) {
+			reloadTime = 8;
+			startingHealth = 3;
+			xMoveSpeed = 15;
+		}
 		this.centerX = centerX;
 		this.centerY = centerY;
 		
-		health = startingHelath;
+		health = startingHealth;
 		
 		collisionDetection = new CollisionDetection();
 		bounce = new TwoDimensionBounce();
@@ -98,6 +108,39 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	}
 
 	public Image getImage() {
+		if (isDying) {
+			if (animationCount <= 30) {
+				animationCount++;
+				return rangerSprites[15];
+			}else if (animationCount <= 60){
+				animationCount++;
+				return rangerSprites[23];
+			}else if (animationCount <= 90){
+				animationCount++;
+				return rangerSprites[31];
+			}else if (animationCount <= 120){
+				animationCount++;
+				return rangerSprites[39];
+			}else if (animationCount <= 150){
+				animationCount++;
+				return rangerSprites[47];
+			}else if (animationCount <= 180){
+				animationCount++;
+				return rangerSprites[55];
+			}else if (animationCount <= 210){
+				animationCount++;
+				return rangerSprites[63];
+			}else if (animationCount <= 240){
+				animationCount++;
+				return rangerSprites[71];
+			}else if (animationCount <= 300){
+				animationCount++;
+				return rangerSprites[79];
+			}else {
+				animationCount = 0;
+				isDead = true;
+				}
+		}
 		if (beenHit) {	
 			if (flickerAnimation <= 10) {
 				flickerAnimation++;
@@ -112,73 +155,73 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 		}
 		if (shooting) {
 			if (((centerX - currentUniverse.getXCenter()) < convertedMouseX)){
-				if (animationCount <= 10) {
+				if (animationCount <= reloadTime) {
 					animationCount++;
 					return rangerSprites[6];
-				}else if (animationCount <= 20){
+				}else if (animationCount <= reloadTime*2){
 					animationCount++;
 					return rangerSprites[14];
-				}else if (animationCount <= 30){
+				}else if (animationCount <= reloadTime*3){
 					animationCount++;
 					return rangerSprites[22];
-				}else if (animationCount <= 40){
+				}else if (animationCount <= reloadTime*4){
 					animationCount++;
 					return rangerSprites[30];
-				}else if (animationCount <= 50){
+				}else if (animationCount <= reloadTime*5){
 					animationCount++;
 					return rangerSprites[38];
-				}else if (animationCount <= 60){
+				}else if (animationCount <= reloadTime*6){
 					animationCount++;
 					return rangerSprites[46];
-				}else if (animationCount <= 70){
+				}else if (animationCount <= reloadTime*7){
 					animationCount++;
 					return rangerSprites[54];
-				}else if (animationCount <= 80){
+				}else if (animationCount <= reloadTime*8){
 					animationCount++;
-					shoot(currentUniverse, convertedMouseX, convertedMouseY);
 					return rangerSprites[62];
-				}else if (animationCount <= 90){
+				}else if (animationCount <= reloadTime*9){
 					animationCount++;
 					return rangerSprites[70];
-				}else if (animationCount <= 100){
+				}else if (animationCount <= reloadTime*10){
 					animationCount = 0;
 					shooting = false;
+					hasShot = false;
 					return rangerSprites[78];
 				}		
 				
 			}
 			else {
-				if (animationCount <= 10) {
+				if (animationCount <= reloadTime) {
 					animationCount++;
 					return rangerSprites[74];
-				}else if (animationCount <= 20){
+				}else if (animationCount <= reloadTime*2){
 					animationCount++;
 					return rangerSprites[66];
-				}else if (animationCount <= 30){
+				}else if (animationCount <= reloadTime*3){
 					animationCount++;
 					return rangerSprites[58];
-				}else if (animationCount <= 40){
+				}else if (animationCount <= reloadTime*4){
 					animationCount++;
 					return rangerSprites[50];
-				}else if (animationCount <= 50){
+				}else if (animationCount <= reloadTime*5){
 					animationCount++;
 					return rangerSprites[42];
-				}else if (animationCount <= 60){
+				}else if (animationCount <= reloadTime*6){
 					animationCount++;
 					return rangerSprites[34];
-				}else if (animationCount <= 70){
+				}else if (animationCount <= reloadTime*7){
 					animationCount++;
 					return rangerSprites[26];
-				}else if (animationCount <= 80){
+				}else if (animationCount <= reloadTime*8){
 					animationCount++;
-					shoot(currentUniverse, convertedMouseX, convertedMouseY);
 					return rangerSprites[18];
-				}else if (animationCount <= 90){
+				}else if (animationCount <= reloadTime*9){
 					animationCount++;
 					return rangerSprites[10];
-				}else if (animationCount <= 100){
+				}else if (animationCount <= reloadTime*10){
 					animationCount = 0;
 					shooting = false;
+					hasShot = false;
 					return rangerSprites[2];
 				}
 				
@@ -322,6 +365,10 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	public int getHealth() {
 		return health;
 	}
+	
+	public boolean getAlive() {
+		return isDead;
+	}
 
 	public void setHealth(int health) {
 		this.health = health;
@@ -329,128 +376,152 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	
 	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 		
-		if (invinsibilityTimer <= 0) {
-			beenHit = false;
-			if (checkOverlap(universe)) {
-				try {
-					checkPixelCollision(universe, overlappingSprite);
-				}
-				catch(Exception ImageOutOfBoundsException){
-				//if at first you don't succeed try try try again
-				}
-			}
+		if (health <= 0) {
+			isDying = true;
 		}
 		else {
-			invinsibilityTimer--;
-		}
-		
-		if (currentUniverse == null) {
-			currentUniverse = universe;
-		}
-		
-		boolean onGround = isOnGround(universe);
-		
-		// Jump
-		if (onGround) {
-			if (keyboard.keyDown(38)) {
-				isJumping = true;
-				this.velocityY -= INITIAL_JUMP_VELOCITY;
-				onGround = false;
-			}
-		}
-		// RIGHT
-		if (keyboard.keyDown(39)) {
-			velocityX += ACCCELERATION_X;
-			if (velocityX > MAX_VELOCITY_X) {
-				velocityX = MAX_VELOCITY_X;
-			}
-		}
-		// LEFT
-		if (keyboard.keyDown(37)) {
-			velocityX -= ACCCELERATION_X;
-			if (velocityX < - MAX_VELOCITY_X) {
-				velocityX = - MAX_VELOCITY_X;
-			}
-		}
-		// DOWN
-		if (keyboard.keyDown(40)) {
-			velocityY += ACCCELERATION_Y/60;
-			if (velocityY < - MAX_VELOCITY_Y) {
-				velocityY = - MAX_VELOCITY_Y;
+			
+			if (keyboard.keyDown(82)) {
+				health = 0;
+				isDying = true;
 			}
 			
-		}
-		this.velocityX = this.velocityX * FRICTION_FACTOR_X;
-		
-		if (velocityY < 0) {
-			collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
-		}
-		else if(velocityY >= 0) {
-			if (keyboard.keyDown(40)){
-				collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
+			if (invinsibilityTimer <= 0) {
+				beenHit = false;
+				if (checkOverlap(universe)) {
+					try {
+						checkPixelCollision(universe, overlappingSprite);
+					}
+					catch(Exception ImageOutOfBoundsException){
+					//if at first you don't succeed try try try again
+					}
+				}
 			}
 			else {
-				collisionDetection.calculate2DBounce(bounce, this, universe.getOneWayBarriers(), velocityX, velocityY, actual_delta_time);
+				invinsibilityTimer--;
 			}
-		}
-		this.centerX = bounce.newX + (width / 2);
-		this.centerY = bounce.newY + (height / 2);
-		this.velocityX = bounce.newVelocityX;
-		this.velocityY = bounce.newVelocityY;
-
-		if (onGround == true) {
-			this.velocityY = 0;
-		} else {
-			this.velocityY = this.velocityY + ACCCELERATION_Y * 0.001 * actual_delta_time;
-			if (this.velocityY < -MAX_VELOCITY_Y)
-				this.velocityY = -MAX_VELOCITY_Y;
-			if (this.velocityY > MAX_VELOCITY_Y)
-				this.velocityY = MAX_VELOCITY_Y;
-		}
-		onGround = isOnGround(universe);
-		
-		if (mouse.buttonDown(1)) {
 			
-			shooting = true;
+			if (currentUniverse == null) {
+				currentUniverse = universe;
+			}
 			
-			double mouseX = mouse.getPosition().getX();
-			double mouseY = mouse.getPosition().getY();
-			//System.out.println(String.format("mouse position: %7.2f, %7.2f", mouseX, mouseY));
+			boolean onGround = isOnGround(universe);
 			
-			convertedMouseX = ((mouseX - 64)/ universe.getScale()) - (universe.getXCenter());   // the 64 comes from the way the frame is drawn rectangularly so the origin is actually 64 pixels (the width of a stony wall tile) further to the right with this particular universe scale 
-			convertedMouseY = ((mouseY / universe.getScale()) - universe.getYCenter());
+			// Jump
+			if (onGround) {
+				if (keyboard.keyDown(38)) {
+					isJumping = true;
+					this.velocityY -= INITIAL_JUMP_VELOCITY;
+					onGround = false;
+				}
+			}
+			// RIGHT
+			if (keyboard.keyDown(39)) {
+				velocityX += xMoveSpeed;
+				if (velocityX > MAX_VELOCITY_X) {
+					velocityX = MAX_VELOCITY_X;
+				}
+			}
+			// LEFT
+			if (keyboard.keyDown(37)) {
+				velocityX -= xMoveSpeed;
+				if (velocityX < - MAX_VELOCITY_X) {
+					velocityX = - MAX_VELOCITY_X;
+				}
+			}
+			// DOWN
+			if (keyboard.keyDown(40)) {
+				velocityY += ACCCELERATION_Y/60;
+				if (velocityY < - MAX_VELOCITY_Y) {
+					velocityY = - MAX_VELOCITY_Y;
+				}
+				
+			}
+			this.velocityX = this.velocityX * FRICTION_FACTOR_X;
 			
-			//System.out.println(String.format("mouse Converted position: %7.2f, %7.2f", convertedMouseX, convertedMouseY));
-		}		
-		
-		reloadTime -= actual_delta_time;
-		
-	}
-	
-	public void shoot(Universe universe, double mouseCenterX, double mouseCenterY) {
-		
-		if (reloadTime <= 0) {
-		
-			double relativeScreenCenterX = ((centerX - universe.getXCenter()) - mouseCenterX);
-			double relativeScreenCenterY = ((centerY - universe.getYCenter()) - mouseCenterY);
-			
-			double angleRadians = Math.atan((relativeScreenCenterY)/(relativeScreenCenterX));
-		
-			if ((centerX - universe.getXCenter()) > mouseCenterX) {
-				if (angleRadians < 0) {
-					angleRadians = -1*((Math.PI) - angleRadians);
+			if (velocityY < 0) {
+				collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
+			}
+			else if(velocityY >= 0) {
+				if (keyboard.keyDown(40)){
+					collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
 				}
 				else {
-					angleRadians = (Math.PI) + angleRadians;
+					collisionDetection.calculate2DBounce(bounce, this, universe.getOneWayBarriers(), velocityX, velocityY, actual_delta_time);
 				}
 			}
-		
-			//System.out.println(String.format("%7.2f", Math.toDegrees(angleRadians))); //for testing angles
-		
-			Projectile arrow = new ArrowSprite(centerX, centerY, angleRadians);
-			universe.getSprites().add(arrow);
-			reloadTime = RELOAD_TIME;
+			this.centerX = bounce.newX + (width / 2);
+			this.centerY = bounce.newY + (height / 2);
+			this.velocityX = bounce.newVelocityX;
+			this.velocityY = bounce.newVelocityY;
+	
+			if (onGround == true) {
+				this.velocityY = 0;
+			} else {
+				this.velocityY = this.velocityY + ACCCELERATION_Y * 0.001 * actual_delta_time;
+				if (this.velocityY < -MAX_VELOCITY_Y)
+					this.velocityY = -MAX_VELOCITY_Y;
+				if (this.velocityY > MAX_VELOCITY_Y)
+					this.velocityY = MAX_VELOCITY_Y;
+			}
+			onGround = isOnGround(universe);
+			
+			if (mouse.buttonDown(1)) {
+				
+				shooting = true;
+				
+				double mouseX = mouse.getPosition().getX();
+				double mouseY = mouse.getPosition().getY();
+				//System.out.println(String.format("mouse position: %7.2f, %7.2f", mouseX, mouseY));
+				
+				convertedMouseX = ((mouseX - 64)/ universe.getScale()) - (universe.getXCenter());   // the 64 comes from the way the frame is drawn rectangularly so the origin is actually 64 pixels (the width of a stony wall tile) further to the right with this particular universe scale 
+				convertedMouseY = ((mouseY / universe.getScale()) - universe.getYCenter());
+				
+				//System.out.println(String.format("mouse Converted position: %7.2f, %7.2f", convertedMouseX, convertedMouseY));
+			}		
+			if ((shooting)&&(animationCount >= reloadTime*8)&&(!(hasShot))){
+				shoot(universe, convertedMouseX, convertedMouseY);
+			}
 		}
+	}
+	
+	private void shoot(Universe universe, double mouseCenterX, double mouseCenterY) {
+		
+		double relativeScreenCenterX = ((centerX - universe.getXCenter()) - mouseCenterX);
+		double relativeScreenCenterY = ((centerY - universe.getYCenter()) - mouseCenterY);
+		
+		double angleRadians = Math.atan((relativeScreenCenterY)/(relativeScreenCenterX));
+	
+		if ((centerX - universe.getXCenter()) > mouseCenterX) {
+			if (angleRadians < 0) {
+				angleRadians = -1*((Math.PI) - angleRadians);
+			}
+			else {
+				angleRadians = (Math.PI) + angleRadians;
+			}
+		}
+	
+		//System.out.println(String.format("%7.2f", Math.toDegrees(angleRadians))); //for testing angles
+	
+		Projectile arrow = new ArrowSprite(centerX, centerY, angleRadians);
+		universe.getSprites().add(arrow);
+		hasShot = true;
+	}
+	
+	public static void resetUpgrades() {
+		reloadTime = 8;
+		startingHealth = 3;
+		xMoveSpeed = 15;
+	}
+	
+	public static int getReloadTime() {
+		return reloadTime;
+	}
+	public static int getStartingHealth() {
+		return startingHealth;
+	}
+	public static double getXMoveSpeed() {
+		return xMoveSpeed;
 	}
 	
 	private boolean checkOverlap(Universe sprites) {

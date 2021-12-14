@@ -1,13 +1,15 @@
 
 public class ShellAnimation implements Animation {
+	
+	private final int TOTAL_UNIVERSES = 4;
 
 	private static int universeCount = 0;
 	
-	public static int getUniverseCount() {
+	public int getUniverseCount() {
 		return universeCount;
 	}
 
-	public static void setUniverseCount(int count) {
+	public void setUniverseCount(int count) {
 		ShellAnimation.universeCount = count;
 	}
 
@@ -15,13 +17,30 @@ public class ShellAnimation implements Animation {
 
 		universeCount++;
 		
-		if (universeCount == 1) {
+		if (universeCount > TOTAL_UNIVERSES) {
+			universeCount = 1;
+		}
+		
+		return getUniverse(universeCount);
+	}
+
+	public Universe getUniverse(int universeNumber) {
+		if(universeCount == 1) {
+			return new StartUniverse();
+		}
+		
+		else if (universeCount == 2) {
+			return new ControlsUniverse();
+		}
+		
+		else if (universeCount == 3) {
+			return new SecondUniverse();
+		}
+		else if (universeCount == 4) {
 			return new FirstUniverse();
 		}
 		else {
 			return null;
 		}
-
 	}
-	
 }
