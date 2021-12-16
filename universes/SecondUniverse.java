@@ -151,6 +151,8 @@ public class SecondUniverse implements FightingUniverse {
 		levelBoss = new SnakeBoss(StandardLevelLayout.TILE_WIDTH * 32, StandardLevelLayout.TILE_HEIGHT * 47);
 		sprites.add(new Turtle(StandardLevelLayout.TILE_WIDTH * 5, StandardLevelLayout.TILE_HEIGHT * 14));
 		sprites.add(new Turtle(StandardLevelLayout.TILE_WIDTH * 59, StandardLevelLayout.TILE_HEIGHT * 33));
+		sprites.add(new OrbitRock(StandardLevelLayout.TILE_WIDTH * 5, StandardLevelLayout.TILE_HEIGHT * 14));
+		sprites.add(new OrbitRock(StandardLevelLayout.TILE_WIDTH * 59, StandardLevelLayout.TILE_HEIGHT * 33));
 		sprites.add(levelBoss);
 		fightStarted = true;
 	}

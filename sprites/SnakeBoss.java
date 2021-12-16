@@ -70,19 +70,19 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 				deathAnimationCounter++;
 				return snakeSprites[3];
 			}
-			else if (deathAnimationCounter <= 200) {
+			else if (deathAnimationCounter <= 150) {
 				deathAnimationCounter++;
 				return snakeSprites[8];
 			}
-			else if (deathAnimationCounter <= 275) {
+			else if (deathAnimationCounter <= 200) {
 				deathAnimationCounter++;
 				return snakeSprites[9];
 			}
-			else if (deathAnimationCounter <= 350) {
+			else if (deathAnimationCounter <= 250) {
 				deathAnimationCounter++;
 				return snakeSprites[10];
 			}
-			else if (deathAnimationCounter <= 425) {
+			else if (deathAnimationCounter <= 300) {
 				deathAnimationCounter++;
 				return snakeSprites[11];
 			}
@@ -91,37 +91,47 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 			}
 		}
 		else if (deathAnimation == 2) {
-			return snakeSprites[12];
+			return snakeSprites[11];
 		}	
 		else if (playerIsToTheRight){
-			if (animationCount <= 30) {
-				animationCount++;
-				return snakeSprites[0];
-			}
-			else if (animationCount <= 60){
-				animationCount++;
-				return snakeSprites[3];
+			if (beenHit) {
+				return snakeSprites[2];
 			}
 			else {
-				animationCount = 0;
-				return snakeSprites[0]; 
+				if (animationCount <= 30) {
+					animationCount++;
+					return snakeSprites[0];
+				}
+				else if (animationCount <= 60){
+					animationCount++;
+					return snakeSprites[3];
+				}
+				else {
+					animationCount = 0;
+					return snakeSprites[0]; 
+				}	
 			}
 		}
 		else {
-			if (animationCount <= 30) {
-				animationCount++;
-				return snakeSprites[4];
-			}
-			else if (animationCount <= 60){
-				animationCount++;
-				return snakeSprites[7];
+			if (beenHit) {
+				return snakeSprites[6];
 			}
 			else {
-				animationCount = 0;
-				return snakeSprites[4]; 
+				if (animationCount <= 30) {
+					animationCount++;
+					return snakeSprites[4];
+				}
+				else if (animationCount <= 60){
+					animationCount++;
+					return snakeSprites[7];
+				}
+				else {
+					animationCount = 0;
+					return snakeSprites[4]; 
+				}
 			}
 		}
-		return snakeSprites[0]; 
+		return snakeSprites[11]; 
 	}
 
 	public boolean getVisible() {
@@ -197,12 +207,12 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 		
 		if (deathAnimation == 2) {
 			this.dispose = true;
+			((FightingUniverse) universe).setIsFightOver(true);
 		}
 		
 		if (health <= 0) {
-			((FightingUniverse) universe).setIsFightStarted(false);
-			((FightingUniverse) universe).setIsFightOver(true);
 			deathAnimation = 1;
+			((FightingUniverse) universe).setIsFightStarted(false);
 		}
 		else {
 			
@@ -305,9 +315,11 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 		if (sprite instanceof ArrowSprite) {
 			
 			if (CollisionDetection.pixelBasedOverlaps(this, sprite)){
-				
-				((ArrowSprite) sprite).setDispose();
-				health = health - ((Projectile) sprite).getDamageGiven();
+				if (!(beenHit)) {
+					((ArrowSprite) sprite).setDispose();
+					health = health - ((Projectile) sprite).getDamageGiven();
+					beenHit = true;
+				}
 			}
 		}				
 	}
