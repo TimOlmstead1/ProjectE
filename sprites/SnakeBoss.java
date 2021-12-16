@@ -53,7 +53,7 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 		health = 4;
 		
 		try {
-			snakeSprites = new Image[8];
+			snakeSprites = new Image[12];
 			for (int i = 1; i <= snakeSprites.length; i++) {
 				String path = String.format("res/greenBoss/snakeBoss%d.png", i);
 				snakeSprites[i-1] = ImageIO.read(new File(path));
@@ -66,21 +66,25 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 
 	public Image getImage() {
 		if (deathAnimation == 1) {
-			if (deathAnimationCounter <= 80) {
+			if (deathAnimationCounter <= 100) {
+				deathAnimationCounter++;
+				return snakeSprites[3];
+			}
+			else if (deathAnimationCounter <= 200) {
+				deathAnimationCounter++;
+				return snakeSprites[8];
+			}
+			else if (deathAnimationCounter <= 275) {
 				deathAnimationCounter++;
 				return snakeSprites[9];
 			}
-			else if (deathAnimationCounter <= 160) {
+			else if (deathAnimationCounter <= 350) {
 				deathAnimationCounter++;
 				return snakeSprites[10];
 			}
-			else if (deathAnimationCounter <= 320) {
+			else if (deathAnimationCounter <= 425) {
 				deathAnimationCounter++;
 				return snakeSprites[11];
-			}
-			else if (deathAnimationCounter <= 480) {
-				deathAnimationCounter++;
-				return snakeSprites[12];
 			}
 			else {
 				deathAnimation = 2;
@@ -218,29 +222,49 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 					checkPixelCollision(universe, overlappingSprite);
 				}
 				catch(Exception ImageOutOfBoundsException){
-				//if at first you don't succeed try try try again   //actually figured out why this didn't work, the arrows needed to have their own collision detection as well 
+				//actually figured out why this didn't work, the arrows needed to have their own collision detection as well 
 				}
 			}
 			
-//			floatingAnimationCount++;
-//			if (floatingAnimationCount <= 20) {
-//				centerY = centerY + 0.5;
-//			}
-//			else if (floatingAnimationCount <= 40){
-//				centerY = centerY - 0.5;
-//			}
-//			else {
-//				floatingAnimationCount = 0;
-//			}
+			floatingAnimationCount++;
+			if (floatingAnimationCount <= 20) {
+				centerY = centerY + 0.5;
+			}
+			else if (floatingAnimationCount <= 40){
+				centerY = centerY - 0.5;
+			}
+			else {
+				floatingAnimationCount = 0;
+			}
 			
-			//
+
 			
 			double travelAngle = (playerAngle(universe));
-			if ((distanceBetweenPlayer(universe) <= 160)&&(distanceBetweenPlayer(universe) > 150)){
+			if ((distanceBetweenPlayer(universe) <= 200)&&(distanceBetweenPlayer(universe) > 170)){
 				velocityX = 0;
 				velocityY = 0;
+				
+				double targetX = universe.getPlayer1().getCenterX();
+				double targetY = universe.getPlayer1().getCenterY();	
+				double angleRadians = Math.atan(Math.abs((centerY - targetY)/(centerX - targetX)));
+				
+				if ((targetX > centerX)&&(targetY > centerY)) {
+				}
+				else if ((targetX < centerX)&&(targetY > centerY)) {
+					angleRadians = Math.PI - angleRadians;
+				}
+				else if ((targetX < centerX)&&(targetY < centerY)) {
+					angleRadians = Math.PI + angleRadians;
+				}
+				else {
+					angleRadians = 2*(Math.PI) - angleRadians;
+				}
+				angleRadians = 2*(Math.PI) - angleRadians;
+				velocityX = Math.sin(angleRadians)*(RESULTANT_VELOCITY);
+				velocityY = Math.cos(angleRadians)*(RESULTANT_VELOCITY);
+				
 			}
-			else if (distanceBetweenPlayer(universe) >= 150) {
+			else if (distanceBetweenPlayer(universe) >= 170) {
 				velocityX = Math.cos(travelAngle)*(RESULTANT_VELOCITY);
 				velocityY = Math.sin(travelAngle)*(RESULTANT_VELOCITY);
 			}
