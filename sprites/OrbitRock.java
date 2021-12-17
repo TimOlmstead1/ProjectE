@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 
 public class OrbitRock implements EnemyProjectile{
 	
-	private final double ORBIT_VELOCITY = 180;
+	private double orbitVelocity = 180;
 	
 	private final double RESULTANT_VELOCITY = 110;
 	
@@ -135,6 +135,10 @@ public class OrbitRock implements EnemyProjectile{
 	public int getHealth() {
 		return health;
 	}
+	
+	public void setOrbitVelocity(double newVelocity) {
+		orbitVelocity = newVelocity;
+	}
 
 	public void setHealth(int health) {
 		this.health = health;
@@ -148,7 +152,7 @@ public class OrbitRock implements EnemyProjectile{
 		FightingUniverse thisUniverse = (FightingUniverse) universe;
 		
 		if (health <= 0) {
-			
+			this.dispose = true;
 		}
 
 		else if (health >= 2) {
@@ -173,17 +177,17 @@ public class OrbitRock implements EnemyProjectile{
 				angleRadians = 2*(Math.PI) - angleRadians;
 			}
 			angleRadians = 2*(Math.PI) - angleRadians;
-			velocityX = Math.sin(angleRadians)*(ORBIT_VELOCITY);
-			velocityY = Math.cos(angleRadians)*(ORBIT_VELOCITY);
+			velocityX = Math.sin(angleRadians)*(orbitVelocity);
+			velocityY = Math.cos(angleRadians)*(orbitVelocity);
 		
-			if (distanceBetweenBoss(thisUniverse) >= 60) {
-				velocityX = velocityX + Math.cos(travelAngle)*(ORBIT_VELOCITY);
-				velocityY = velocityY + Math.sin(travelAngle)*(ORBIT_VELOCITY);
+			if (distanceBetweenBoss(thisUniverse) >= 50) {
+				velocityX = velocityX + Math.cos(travelAngle)*(orbitVelocity);
+				velocityY = velocityY + Math.sin(travelAngle)*(orbitVelocity);
 			}
 			
-			else if (distanceBetweenBoss(thisUniverse) <= 30){
-				velocityX = velocityX + Math.cos(travelAngle)*(ORBIT_VELOCITY)*(-1);
-				velocityY = velocityY + Math.sin(travelAngle)*(ORBIT_VELOCITY)*(-1);
+			else if (distanceBetweenBoss(thisUniverse) <= 20){
+				velocityX = velocityX + Math.cos(travelAngle)*(orbitVelocity)*(-1);
+				velocityY = velocityY + Math.sin(travelAngle)*(orbitVelocity)*(-1);
 			}
 			double movement_x = (this.velocityX * actual_delta_time * 0.001);
 			double movement_y = (this.velocityY * actual_delta_time * 0.001);
@@ -192,6 +196,12 @@ public class OrbitRock implements EnemyProjectile{
 			this.centerY += movement_y;
 			
 			checkOverlap(universe, "ArrowSprite");
+			if (checkOverlap(universe, "OrbitRock")) {
+				orbitVelocity = 250;
+			}
+			else {
+				orbitVelocity = 180;
+			}
 		}
 		else {
 			double movement_x = (this.velocityX * actual_delta_time * 0.001);
@@ -201,6 +211,12 @@ public class OrbitRock implements EnemyProjectile{
 			this.centerY += movement_y;
 			
 			checkOverlap(universe, "ArrowSprite");
+			if (checkOverlap(universe, "OrbitRock")) {
+				orbitVelocity = 250;
+			}
+			else {
+				orbitVelocity = 180;
+			}
 		}
 	}
 	
@@ -250,6 +266,9 @@ public class OrbitRock implements EnemyProjectile{
 					if (targetSprite.equals("ArrowSprite")) {
 						((Projectile) sprite).setDispose();
 						health--;
+					}
+					if (targetSprite.equals("OrbitRock")) {
+						((OrbitRock) sprite).setOrbitVelocity(100);
 					}
 					overlap = true;
 					break;					
