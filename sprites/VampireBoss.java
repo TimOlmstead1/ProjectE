@@ -198,6 +198,7 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 		
 		if (deathAnimation == 2) {
+			((FightingUniverse) universe).setIsFightOver(true);
 			this.dispose = true;
 		}
 		
@@ -212,7 +213,6 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 			if (bloodRage) {
 				bloodRageTimer = bloodRageTimer - (actual_delta_time*0.01);
 				if (bloodRageTimer < 0) {
-					health++;
 					bloodRage = false;
 					bloodRageOver = true;
 				}
@@ -220,10 +220,10 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 			
 		
 			if (health > 3) {
-				shieldDuration = 100;
+				shieldDuration = 85;
 			}
 			else if (health < 3) {
-				shieldDuration = 200;
+				shieldDuration = 180;
 			}
 			
 			//
@@ -297,9 +297,9 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 					move(universe);
 					fireInCircle(universe);
 					universe.getSprites().add(new Cultist(centerX, centerY));
-					universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe)));
-					universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) + Math.PI/48)); //3.75 degrees
-					universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) - + Math.PI/48));
+					universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 0));
+					universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) + Math.PI/48, 0)); //3.75 degrees
+					universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) - + Math.PI/48, 0));
 					bloodRageSummon = true;
 				}
 				else if ((bloodRageTimer % 50 > 1)&&((bloodRageSummon))){
@@ -309,17 +309,26 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 			
 			if (beenHit && (health > 0)) {
 				move(universe);
-				universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 1));
-				universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 48));
-				universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 48));
-				universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 1));
+				int random = (int) ((Math.random() * (4 - 1)) + 1);
+				if (!(random == 1)) {
+					universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 1));
+				}
+				if (!(random == 2)) {
+					universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 48));
+				}
+				if (!(random == 3)) {
+					universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 48));
+				}
+				if (!(random == 4)) {
+					universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 1));
+				}
 				beenHit = false;
 			}
 			else if ((timeAlive >= timeLastMoved + 90)){
 				move(universe);
-				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe)));
-				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) + Math.PI/24)); // 7.5 degrees more
-				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) - + Math.PI/24)); // same but less
+				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 0));
+				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) + Math.PI/24, 0)); // 7.5 degrees more
+				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) - + Math.PI/24, 0)); // same but less
 			}
 			
 			if ((health == 1)&&(!(bloodRageStarted))) {
@@ -427,7 +436,7 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 	
 	private void fireInCircle(Universe universe) {
 		for (int i = 0; i < 24; i++) {
-			universe.getSprites().add(new BloodProjectile(centerX, centerY, 0 + i*(Math.PI/12)));
+			universe.getSprites().add(new BloodProjectile(centerX, centerY, 0 + i*(Math.PI/12), 0));
 		}
 	}
 }

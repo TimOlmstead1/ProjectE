@@ -39,14 +39,35 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 	
 	private double timeAlive = 0;
 	
+	private boolean shootingAnimation = false;
 	private int deathAnimation = 0; //0 is not started, 1 is started, and 2 is complete
 	private double deathAnimationCounter = 0;
 	
 	private boolean playerIsToTheRight = false;
+	
+	private EnemyProjectile[] rockShield;
+	private boolean rocksAdded;
 
+	private double timeLastShot = 0;
+	private double timeHit = 0;
+	private boolean angry = false;
+	private boolean cosmic = false;
+	private int cosmicCount = 0;
+	
 	public SnakeBoss(double centerX, double centerY) {
 		this.centerX = centerX;
 		this.centerY = centerY;
+		
+		rockShield = new EnemyProjectile[16];
+		for (int i = 0; i < rockShield.length; i++) {
+			if (i > 7) {
+				rockShield[i] = new PositionRock(8, i-8);
+			}
+			else {
+				rockShield[i] = new PositionRock(4, i);
+			}
+		}
+		rocksAdded = false;
 		
 		collisionDetection = new CollisionDetection();
 		
@@ -97,6 +118,9 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 			if (beenHit) {
 				return snakeSprites[2];
 			}
+			else if (shootingAnimation) {
+				return snakeSprites[1];
+			}
 			else {
 				if (animationCount <= 30) {
 					animationCount++;
@@ -115,6 +139,9 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 		else {
 			if (beenHit) {
 				return snakeSprites[6];
+			}
+			else if (shootingAnimation) {
+				return snakeSprites[5];
 			}
 			else {
 				if (animationCount <= 30) {
@@ -206,8 +233,8 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
 		
 		if (deathAnimation == 2) {
-			this.dispose = true;
 			((FightingUniverse) universe).setIsFightOver(true);
+			this.dispose = true;
 		}
 		
 		if (health <= 0) {
@@ -215,6 +242,22 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 			((FightingUniverse) universe).setIsFightStarted(false);
 		}
 		else {
+			
+			if (!(rocksAdded)) {
+				for(int i = 0; i < rockShield.length; i++) {
+					if (!(rockShield[i] == null)) {
+						universe.getSprites().add(rockShield[i]);
+					}
+				}
+				rocksAdded = true;
+			}
+			for (int i = 0; i < rockShield.length; i++) {
+				if (!(rockShield[i] == null)) {
+					if (((PositionRock) rockShield[i]).getHealth() <= 2){
+						rockShield[i] = null;
+					}
+				}
+			}
 			
 			if (universe.getPlayer1().getCenterX() > centerX) {
 				playerIsToTheRight = true;
@@ -291,7 +334,41 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 			this.centerY += movement_y;
 			
 			//
+			if (((cosmic)&&(timeAlive >= timeLastShot + 5)&&(timeAlive >= timeHit + 15))) {
+				beenHit = false;
+				cosmicShot(universe);
+				timeLastShot = timeAlive;
+			}
+			if ((cosmic)&&(timeAlive >= timeHit + 80)){
+				cosmic = false;
+				timeHit = timeAlive;
+				timeLastShot = timeAlive;
+				angry = true;
+			}
 			
+			
+			if (((angry)&&(timeAlive >= timeLastShot + 3)&&(timeAlive >= timeHit + 15))) {
+				beenHit = false;
+				shootingAnimation = true;
+				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 1));
+				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) + Math.PI/48, 1)); // 3.25 degrees more
+				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) - + Math.PI/48, 1)); // same but less
+				timeLastShot = timeAlive;
+			}
+			if ((angry)&&(timeAlive >= timeHit + 65)){
+				angry = false;
+				shootingAnimation = false;
+			}
+			
+			
+			if (timeAlive >= timeLastShot + 57) {
+				shootingAnimation = true;
+			}
+			if (timeAlive >= timeLastShot + 60) {
+				shootingAnimation = false;
+				timeLastShot = timeAlive;
+				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 1));
+			}
 		}
 	}
 	
@@ -319,6 +396,24 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 					((ArrowSprite) sprite).setDispose();
 					health = health - ((Projectile) sprite).getDamageGiven();
 					beenHit = true;
+					timeHit = timeAlive;
+					for(int i = 0; i < rockShield.length; i++) {
+						if (rockShield[i] == null) {
+							if (i > 7) {
+								rockShield[i] = new PositionRock(8, i-8);
+							}
+							else {
+								rockShield[i] = new PositionRock(4, i);
+							}
+							universe.getSprites().add(rockShield[i]);
+						}
+					}
+					if (health > 1) {
+						angry = true;
+					}
+					else {
+						cosmic = true;
+					}
 				}
 			}
 		}				
@@ -358,5 +453,20 @@ public class SnakeBoss implements EnemySprite, MovableSprite{
 		double targetY = universe.getPlayer1().getCenterY();
 		diagonalDistance = Math.sqrt(Math.pow((targetX - centerX),2) + Math.pow((targetY - centerY),2));
 		return diagonalDistance;
+	}
+	
+	private void cosmicShot(Universe universe) {
+		if (cosmicCount == 0) {
+			for(int i = 0; i < 20; i++) {
+				universe.getSprites().add(new BloodProjectile(24, 24, 0 + i*(Math.PI/10), 1));
+			}
+			cosmicCount++;
+		}
+		else if (cosmicCount == 1) {
+			for(int i = 0; i < 20; i++) {
+				universe.getSprites().add(new BloodProjectile(24, 24, Math.PI/20 + i*(Math.PI/10), 1));
+			}
+			cosmicCount--;
+		}
 	}
 }

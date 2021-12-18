@@ -34,10 +34,10 @@ public class ShellAnimation implements Animation {
 		}
 		
 		else if (universeCount == 3) {
-			return new SecondUniverse();
+			return new FirstUniverse();
 		}
 		else if (universeCount == 4) {
-			return new FirstUniverse();
+			return new SecondUniverse();
 		}
 		else {
 			return null;

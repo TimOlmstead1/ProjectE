@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
-public class OrbitRock implements EnemyProjectile{
+public class PositionRock implements EnemyProjectile{
 	
-	private double orbitVelocity = 180;
-	
-	private final double RESULTANT_VELOCITY = 110;
+	private final double RESULTANT = 40;
+	private final double RESULTANT_VELOCITY = 65;
+	private final double INCREASE_VELOCITY = 5;
+	private final double MAXIMUM_VELOCITY = 150;
 	
 	private double velocityY = 0;
 	private double velocityX = 0;
@@ -32,12 +33,14 @@ public class OrbitRock implements EnemyProjectile{
 	
 	private int health;
 	private boolean beenHit = false;
+	private int position;
+	private int angleOffset;
 
-	public OrbitRock(double centerX, double centerY) {
-		this.centerX = centerX;
-		this.centerY = centerY;
+	public PositionRock(int angleOffset, int position) {
+		this.position = position;
+		this.angleOffset = angleOffset;
 		
-		health = 3;
+		health = 4;
 		
 		collisionDetection = new CollisionDetection();
 		
@@ -56,16 +59,16 @@ public class OrbitRock implements EnemyProjectile{
 	}
 
 	public Image getImage() {
-		if (health == 3) {
+		if (health == 4) {
 			return orbitRocks[0]; 
 		}
-		else if(health == 2) {
+		else if(health == 3) {
 			return orbitRocks[1]; 
 		}
-		else if(health == 1) {
+		else if(health == 2) {
 			return orbitRocks[2]; 
 		}
-		else if(health == 0) {
+		else if(health == 1) {
 			return orbitRocks[3]; 
 		}
 		return orbitRocks[3]; 
@@ -136,10 +139,6 @@ public class OrbitRock implements EnemyProjectile{
 		return health;
 	}
 	
-	public void setOrbitVelocity(double newVelocity) {
-		orbitVelocity = newVelocity;
-	}
-
 	public void setHealth(int health) {
 		this.health = health;
 	}
@@ -155,66 +154,30 @@ public class OrbitRock implements EnemyProjectile{
 			this.dispose = true;
 		}
 
-		else if (health >= 2) {
-			double travelAngle = (bossAngle(thisUniverse));
+		else if (health >= 3) {
+			double locationAroundBossX = RESULTANT * Math.cos((position*(Math.PI/4)) - (Math.PI/angleOffset));
+			double locationAroundBossY = RESULTANT * Math.sin((position*(Math.PI/4)) - (Math.PI/angleOffset));
+			centerX = thisUniverse.getBoss().getCenterX() + locationAroundBossX;
+			centerY = thisUniverse.getBoss().getCenterY() + locationAroundBossY;
+		}
+		else if (health >= 1) {
 			
-			velocityX = 0;
-			velocityY = 0;
-			
-			double targetX = thisUniverse.getBoss().getCenterX();
-			double targetY = thisUniverse.getBoss().getCenterY();	
-			double angleRadians = Math.atan(Math.abs((centerY - targetY)/(centerX - targetX)));
-			
-			if ((targetX > centerX)&&(targetY > centerY)) {
+			velocityX = velocityX + Math.cos(playerAngle(universe))*(INCREASE_VELOCITY) + Math.cos(playerAngle(universe))*(RESULTANT/distanceBetweenPlayer(universe));
+			velocityY = velocityY + Math.sin(playerAngle(universe))*(INCREASE_VELOCITY) + Math.sin(playerAngle(universe))*(RESULTANT/distanceBetweenPlayer(universe));
+			if (velocityX > MAXIMUM_VELOCITY) {
+				velocityX = MAXIMUM_VELOCITY;
 			}
-			else if ((targetX < centerX)&&(targetY > centerY)) {
-				angleRadians = Math.PI - angleRadians;
-			}
-			else if ((targetX < centerX)&&(targetY < centerY)) {
-				angleRadians = Math.PI + angleRadians;
-			}
-			else {
-				angleRadians = 2*(Math.PI) - angleRadians;
-			}
-			angleRadians = 2*(Math.PI) - angleRadians;
-			velocityX = Math.sin(angleRadians)*(orbitVelocity);
-			velocityY = Math.cos(angleRadians)*(orbitVelocity);
-		
-			if (distanceBetweenBoss(thisUniverse) >= 50) {
-				velocityX = velocityX + Math.cos(travelAngle)*(orbitVelocity);
-				velocityY = velocityY + Math.sin(travelAngle)*(orbitVelocity);
+			if (velocityY > MAXIMUM_VELOCITY) {
+				velocityY = MAXIMUM_VELOCITY;
 			}
 			
-			else if (distanceBetweenBoss(thisUniverse) <= 20){
-				velocityX = velocityX + Math.cos(travelAngle)*(orbitVelocity)*(-1);
-				velocityY = velocityY + Math.sin(travelAngle)*(orbitVelocity)*(-1);
-			}
 			double movement_x = (this.velocityX * actual_delta_time * 0.001);
 			double movement_y = (this.velocityY * actual_delta_time * 0.001);
 			    
 			this.centerX += movement_x;
 			this.centerY += movement_y;
-			
-			checkOverlap(universe, "ArrowSprite");
-			if (checkOverlap(universe, "OrbitRock")) {
-				orbitVelocity = 250;
-			}
-			else {
-				orbitVelocity = 180;
-			}
 		}
-		else {
-			double movement_x = (this.velocityX * actual_delta_time * 0.001);
-			double movement_y = (this.velocityY * actual_delta_time * 0.001);
-			    
-			this.centerX += movement_x;
-			this.centerY += movement_y;
-			
-			checkOverlap(universe, "ArrowSprite");
-			if (checkOverlap(universe, "OrbitRock")) {
-				orbitVelocity = 300;
-			}
-		}
+		checkOverlap(thisUniverse, "ArrowSprite");
 	}
 	
 	public void setDispose() {
@@ -225,10 +188,37 @@ public class OrbitRock implements EnemyProjectile{
 		return 1;
 	}
 	
-	private double bossAngle(FightingUniverse universe) { //finds the angle between the player and the boss
+	private boolean checkOverlap(Universe sprites, String targetSprite) {
+
+		boolean overlap = false;
+
+		for (DisplayableSprite sprite : sprites.getSprites()) {
+			if (sprite.getClass().toString().contains(targetSprite)) {
+				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
+					if (targetSprite.equals("ArrowSprite")) {
+						health = health - ((Projectile) sprite).getDamageGiven();
+						((Projectile) sprite).setDispose();
+						if (health == 2) {
+							velocityX = Math.cos(playerAngle(sprites))*(RESULTANT_VELOCITY);
+							velocityY = Math.sin(playerAngle(sprites))*(RESULTANT_VELOCITY);
+						}
+					}
+					overlap = true;
+					break;					
+				}
+			}
+		}		
+		return overlap;		
+	}
+
+	public int getDamageGiven() {
+		return 1;
+	}
+	
+	private double playerAngle(Universe universe) { //finds the angle between the player and the boss
 		
-		double targetX = universe.getBoss().getCenterX();
-		double targetY = universe.getBoss().getCenterY();	
+		double targetX = universe.getPlayer1().getCenterX();
+		double targetY = universe.getPlayer1().getCenterY();	
 		double angleRadians = Math.atan((centerY - targetY)/(centerX - targetX));
 		
 		if (angleRadians < 0) { //negative radians (since CAST)
@@ -245,38 +235,11 @@ public class OrbitRock implements EnemyProjectile{
 		return angleRadians;
 	}
 	
-	private double distanceBetweenBoss(FightingUniverse universe) {
+	private double distanceBetweenPlayer(Universe universe) {
 		double diagonalDistance;
-		double targetX = universe.getBoss().getCenterX();
-		double targetY = universe.getBoss().getCenterY();
+		double targetX = universe.getPlayer1().getCenterX();
+		double targetY = universe.getPlayer1().getCenterY();
 		diagonalDistance = Math.sqrt(Math.pow((targetX - centerX),2) + Math.pow((targetY - centerY),2));
 		return diagonalDistance;
-	}
-	
-	private boolean checkOverlap(Universe sprites, String targetSprite) {
-
-		boolean overlap = false;
-
-		for (DisplayableSprite sprite : sprites.getSprites()) {
-			if (sprite.getClass().toString().contains(targetSprite)) {
-				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
-					if (targetSprite.equals("ArrowSprite")) {
-						((Projectile) sprite).setDispose();
-						health--;
-					}
-					if (targetSprite.equals("OrbitRock")) {
-						((OrbitRock) sprite).setOrbitVelocity(70);
-						orbitVelocity = 300;
-					}
-					overlap = true;
-					break;					
-				}
-			}
-		}		
-		return overlap;		
-	}
-
-	public int getDamageGiven() {
-		return 1;
 	}
 }

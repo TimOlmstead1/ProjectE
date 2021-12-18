@@ -20,18 +20,24 @@ public class BloodProjectile implements EnemyProjectile{
 	private final double RESULTANT_VELOCITY = 180;
 	
 	private double angle; //in radians
+	private int type = 0; //0 is blood 1 is ice
 	private static Image image = null;
+	private static Image iceBall = null;
 	
 	private int damage = 1;
+
 	
-	public BloodProjectile(double centerX, double centerY, double angle) {
+	
+	public BloodProjectile(double centerX, double centerY, double angle, int type) {
 		this.centerX = centerX;
 		this.centerY = centerY;
 		this.angle = angle;
+		this.type = type;
 		
 		if (image == null) {
 			try {
 				image = ImageIO.read(new File("res/BloodBall.png"));
+				iceBall = ImageIO.read(new File("res/BlueFireBall.png"));
 			}
 			catch (IOException e) {
 				System.out.print(e.toString());
@@ -45,7 +51,10 @@ public class BloodProjectile implements EnemyProjectile{
 	}
 
 	public Image getImage() {
-		return image;
+		if (type == 0) {
+			return image;
+		}
+		return iceBall;
 	}
 
 	public boolean getVisible() {
