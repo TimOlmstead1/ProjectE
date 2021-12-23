@@ -1,7 +1,7 @@
 import java.awt.MouseInfo;
 import java.util.ArrayList;
 
-public class FirstUniverse implements FightingUniverse {
+public class EasyUniverse implements FightingUniverse {
 
 	private boolean complete = false;	
 	private Background background = null;	
@@ -21,7 +21,7 @@ public class FirstUniverse implements FightingUniverse {
 	private boolean fightOver = false;
 	private EnemySprite levelBoss;
 	
-	public FirstUniverse () {
+	public EasyUniverse () {
 
 		this.setXCenter(256);
 		this.setYCenter(208);
@@ -148,9 +148,7 @@ public class FirstUniverse implements FightingUniverse {
 	}
 
 	public void startFight() {
-		levelBoss = new VampireBoss(StandardLevelLayout.TILE_WIDTH * 32, StandardLevelLayout.TILE_HEIGHT * 47);
-		sprites.add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 28, StandardLevelLayout.TILE_HEIGHT * 48));
-		sprites.add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 36, StandardLevelLayout.TILE_HEIGHT * 48));
+		levelBoss = new MageBoss(StandardLevelLayout.TILE_WIDTH * 32, StandardLevelLayout.TILE_HEIGHT * 47);
 		sprites.add(levelBoss);
 		fightStarted = true;
 	}

@@ -482,7 +482,7 @@ public class AnimationFrame extends JFrame {
 	
 	protected void btnUp1_mouseClicked(MouseEvent arg0) {
 		upgradeSelected = true;
-		RangerCharacterSprite.reloadTime = RangerCharacterSprite.getReloadTime() - 2;
+		RangerCharacterSprite.reloadTime = RangerCharacterSprite.getReloadTime() - 1;
 		for (int i = 0; i < upgrades.length; i++) {
 			upgrades[i].setVisible(false);
 		}

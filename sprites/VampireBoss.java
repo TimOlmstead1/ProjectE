@@ -223,7 +223,7 @@ public class VampireBoss implements EnemySprite, MovableSprite{
 				shieldDuration = 85;
 			}
 			else if (health < 3) {
-				shieldDuration = 180;
+				shieldDuration = 200;
 			}
 			
 			//
