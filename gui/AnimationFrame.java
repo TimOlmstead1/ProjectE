@@ -35,6 +35,7 @@ public class AnimationFrame extends JFrame {
 	private JLabel[] healthBar = new JLabel[5];
 	private JLabel[] bossBar = new JLabel[10];
 	private JButton[] upgrades = new JButton[3];
+	private JButton[] levels = new JButton[3];
 	
 	private int lastCheckedBossHealth = 0;
 	private int lastCheckedPlayerHealth = 0;
@@ -44,6 +45,7 @@ public class AnimationFrame extends JFrame {
 	private JButton btnStartGame;
 	private JButton btnExitGame;
 	private JButton btnControls;
+	private JButton btnLevelSelect;
 	private JLabel lblStatus;;
 
 	private static boolean stop = false;
@@ -51,7 +53,11 @@ public class AnimationFrame extends JFrame {
 	private boolean exitGameClicked = false;
 	private boolean controlsClicked = false;
 	private boolean controlsOpen = false;
+	private boolean levelClicked = false;
+	private boolean levelOpen = false;
+	
 	private boolean upgradeSelected = false;
+	private boolean levelSelected = false;
 
 
 	private long current_time = 0;								//MILLISECONDS
@@ -161,8 +167,51 @@ public class AnimationFrame extends JFrame {
 			getContentPane().add(upgrades[i]);
 			getContentPane().setComponentZOrder(upgrades[i], 0);
 			upgrades[i].setVisible(false);
+			
+			
 		}
 
+		for (int i = 0; i < levels.length; i++) {
+			levels[i] = new JButton(String.format("Level %d", i+1)); 
+			levels[i].setOpaque(true);
+			levels[i].setBackground(Color.GRAY);
+			levels[i].setForeground(Color.BLACK);
+			levels[i].setFont(new Font("Tahoma", Font.BOLD, 20));
+			if (i == 0) {
+				levels[i].addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent arg0) {
+						btnLvl1_mouseClicked(arg0);
+					}
+					
+				
+				});
+			}
+			else if (i == 1) {
+				levels[i].addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent arg0) {
+						btnLvl2_mouseClicked(arg0);
+					}
+					
+				
+				});
+			}
+			else {
+				levels[i].addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent arg0) {
+						btnLvl3_mouseClicked(arg0);
+					}
+					
+				
+				});
+			}
+			levels[i].setBounds((i*210) + 200, 330, 200, 64);  //10 extra pixels of space between the buttons 
+			getContentPane().add(levels[i]);
+			getContentPane().setComponentZOrder(levels[i], 0);
+			levels[i].setVisible(false);
+			
+			
+		}
+		
 		btnPauseRun = new JButton("||");
 		btnPauseRun.addMouseListener(new MouseAdapter() {
 			@Override
@@ -171,6 +220,16 @@ public class AnimationFrame extends JFrame {
 			}
 			
 		
+		});
+		
+		btnLevelSelect = new JButton("Level Select");
+		btnLevelSelect.setOpaque(true);
+		btnLevelSelect.setBackground(Color.GRAY);
+		btnLevelSelect.setForeground(Color.BLACK);
+		btnLevelSelect.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent arg0) {
+				btnLevelSelect_mouseClicked(arg0);
+			}		
 		});
 		
 		btnExitGame = new JButton("Quit");
@@ -183,7 +242,7 @@ public class AnimationFrame extends JFrame {
 			}		
 		});
 		
-		btnStartGame = new JButton("Click Here To Start");
+		btnStartGame = new JButton("Start New Run");
 		btnStartGame.setOpaque(true);
 		btnStartGame.setBackground(Color.GRAY);
 		btnStartGame.setForeground(Color.BLACK);
@@ -240,18 +299,24 @@ public class AnimationFrame extends JFrame {
 		getContentPane().add(btnStartGame);
 		getContentPane().setComponentZOrder(btnStartGame, 0);
 		
-		btnExitGame.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnExitGame.setBounds(400, 420, 230, 50);
-		btnExitGame.setFocusable(false);
-		getContentPane().add(btnExitGame);
-		getContentPane().setComponentZOrder(btnExitGame, 0);
+		btnLevelSelect.setFont(new Font("Tahoma", Font.BOLD, 20));
+		btnLevelSelect.setBounds(400, 350, 230, 50);
+		btnLevelSelect.setFocusable(false);
+		getContentPane().add(btnLevelSelect);
+		getContentPane().setComponentZOrder(btnLevelSelect, 0);	
 		
 		btnControls.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnControls.setBounds(400, 350, 230, 50);
+		btnControls.setBounds(400, 420, 230, 50);
 		btnControls.setFocusable(false);
 		getContentPane().add(btnControls);
 		getContentPane().setComponentZOrder(btnControls, 0);
 
+		btnExitGame.setFont(new Font("Tahoma", Font.BOLD, 20));
+		btnExitGame.setBounds(400, 490, 230, 50);
+		btnExitGame.setFocusable(false);
+		getContentPane().add(btnExitGame);
+		getContentPane().setComponentZOrder(btnExitGame, 0);
+		
 		lblStatus = new JLabel("Status");
 		lblStatus.setForeground(Color.WHITE);
 		lblStatus.setFont(new Font("Optima", Font.BOLD, 30));
@@ -335,6 +400,7 @@ public class AnimationFrame extends JFrame {
 				//REFRESH
 				if (universe instanceof FightingUniverse) {
 					btnExitGame.setVisible(false);
+					btnLevelSelect.setVisible(false);
 					btnStartGame.setVisible(false);
 					btnControls.setVisible(false);
 					if ((((FightingUniverse) universe).getIsFightOver())&&(upgradeSelected)) {
@@ -346,11 +412,13 @@ public class AnimationFrame extends JFrame {
 					btnExitGame.setVisible(false);
 					btnStartGame.setVisible(false);
 					btnControls.setVisible(false);
+					btnLevelSelect.setVisible(false);
 				}
 				else {
 					btnExitGame.setVisible(true);
 					btnStartGame.setVisible(true);
 					btnControls.setVisible(true);
+					btnLevelSelect.setVisible(true);
 					lastCheckedBossHealth = 0;
 					lastCheckedPlayerHealth = 0;
 					for (int i = 0; i < healthBar.length; i++) {
@@ -370,6 +438,10 @@ public class AnimationFrame extends JFrame {
 						universe.setComplete(true);
 						controlsClicked = false;
 					}
+					if (levelClicked) {
+						universe.setComplete(true);
+						levelClicked = false;
+					}
 				}
 				this.repaint();
 			}
@@ -381,6 +453,10 @@ public class AnimationFrame extends JFrame {
 				if ((animation.getUniverseCount() == 2)&&(controlsOpen)) {
 					animation.setUniverseCount(0);
 					controlsOpen = false;
+				}
+				else if ((animation.getUniverseCount() == 2)&&(levelOpen)) {
+					animation.setUniverseCount(5);
+					levelOpen = false;
 				}
 				else if (universe instanceof FightingUniverse) {
 					if (!(((FightingUniverse) universe).getIsFightOver())) {
@@ -474,10 +550,15 @@ public class AnimationFrame extends JFrame {
 		exitGameClicked = true;
 	}
 	
+	protected void btnLevelSelect_mouseClicked(MouseEvent arg0) {
+		animation.setUniverseCount(5);
+		levelClicked = true;
+		levelOpen = true;
+	}
+	
 	protected void btnControls_mouseClicked(MouseEvent arg0) {
 		controlsClicked = true;
 		controlsOpen = true;
-		this.btnStartGame.setVisible(false);
 	}
 	
 	protected void btnUp1_mouseClicked(MouseEvent arg0) {
