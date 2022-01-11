@@ -173,6 +173,9 @@ public class SecondUniverse implements FightingUniverse {
 
 	public void setIsFightOver(boolean isOver) {
 		fightOver = isOver;
+		if (RangerCharacterSprite.levelsUnlocked < 4) {
+			RangerCharacterSprite.levelsUnlocked = 4;
+		}
 	}
 
 	public boolean getIsFightOver() {

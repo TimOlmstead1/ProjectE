@@ -22,6 +22,8 @@ public class EasyUniverse implements FightingUniverse {
 	private EnemySprite levelBoss;
 	
 	public EasyUniverse () {
+		
+		RangerCharacterSprite.resetUpgrades();
 
 		this.setXCenter(256);
 		this.setYCenter(208);
@@ -171,6 +173,9 @@ public class EasyUniverse implements FightingUniverse {
 
 	public void setIsFightOver(boolean isOver) {
 		fightOver = isOver;
+		if (RangerCharacterSprite.levelsUnlocked < 2) {
+			RangerCharacterSprite.levelsUnlocked = 2;
+		}
 	}
 	
 	public boolean getIsFightOver() {

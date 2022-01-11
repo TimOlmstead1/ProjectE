@@ -204,7 +204,7 @@ public class AnimationFrame extends JFrame {
 				
 				});
 			}
-			levels[i].setBounds((i*210) + 200, 330, 200, 64);  //10 extra pixels of space between the buttons 
+			levels[i].setBounds(400, (i*75) + 330, 175, 64);  //10 extra pixels of space between the buttons 
 			getContentPane().add(levels[i]);
 			getContentPane().setComponentZOrder(levels[i], 0);
 			levels[i].setVisible(false);
@@ -403,6 +403,9 @@ public class AnimationFrame extends JFrame {
 					btnLevelSelect.setVisible(false);
 					btnStartGame.setVisible(false);
 					btnControls.setVisible(false);
+					for (int i = 0; i < levels.length; i++) {
+						levels[i].setVisible(false);
+					}
 					if ((((FightingUniverse) universe).getIsFightOver())&&(upgradeSelected)) {
 						universe.setComplete(true);
 						upgradeSelected = false;
@@ -413,12 +416,35 @@ public class AnimationFrame extends JFrame {
 					btnStartGame.setVisible(false);
 					btnControls.setVisible(false);
 					btnLevelSelect.setVisible(false);
+					for (int i = 0; i < levels.length; i++) {
+						levels[i].setVisible(false);
+					}
+				}
+				else if (universe instanceof LvlUniverse) {
+					btnExitGame.setVisible(false);
+					btnStartGame.setVisible(false);
+					btnControls.setVisible(false);
+					btnLevelSelect.setVisible(false);
+					if (levelSelected) {
+						universe.setComplete(true);
+						levelSelected = false;
+					}
+					else {
+						for (int i = 0; i < levels.length; i++) {
+							if (RangerCharacterSprite.levelsUnlocked >= i+1) {
+								levels[i].setVisible(true);
+							}
+						}
+					}
 				}
 				else {
 					btnExitGame.setVisible(true);
 					btnStartGame.setVisible(true);
 					btnControls.setVisible(true);
 					btnLevelSelect.setVisible(true);
+					for (int i = 0; i < levels.length; i++) {
+						levels[i].setVisible(false);
+					}
 					lastCheckedBossHealth = 0;
 					lastCheckedPlayerHealth = 0;
 					for (int i = 0; i < healthBar.length; i++) {
@@ -453,10 +479,6 @@ public class AnimationFrame extends JFrame {
 				if ((animation.getUniverseCount() == 2)&&(controlsOpen)) {
 					animation.setUniverseCount(0);
 					controlsOpen = false;
-				}
-				else if ((animation.getUniverseCount() == 2)&&(levelOpen)) {
-					animation.setUniverseCount(5);
-					levelOpen = false;
 				}
 				else if (universe instanceof FightingUniverse) {
 					if (!(((FightingUniverse) universe).getIsFightOver())) {
@@ -579,9 +601,36 @@ public class AnimationFrame extends JFrame {
 	
 	protected void btnUp3_mouseClicked(MouseEvent arg0) {
 		upgradeSelected = true;
-		RangerCharacterSprite.xMoveSpeed = RangerCharacterSprite.getXMoveSpeed() + 10;
 		for (int i = 0; i < upgrades.length; i++) {
 			upgrades[i].setVisible(false);
+		}
+	}
+	protected void btnLvl1_mouseClicked(MouseEvent arg0) {
+		levelSelected = true;
+		animation.setUniverseCount(2);
+		for (int i = 0; i < levels.length; i++) {
+			levels[i].setVisible(false);
+		}
+	}
+	protected void btnLvl2_mouseClicked(MouseEvent arg0) {
+		levelSelected = true;
+		animation.setUniverseCount(3);
+		for (int i = 0; i < levels.length; i++) {
+			levels[i].setVisible(false);
+		}
+	}
+	protected void btnLvl3_mouseClicked(MouseEvent arg0) {
+		levelSelected = true;
+		animation.setUniverseCount(4);
+		for (int i = 0; i < levels.length; i++) {
+			levels[i].setVisible(false);
+		}
+	}
+	protected void btnLvl4_mouseClicked(MouseEvent arg0) {
+		levelSelected = true;
+		animation.setUniverseCount(6);
+		for (int i = 0; i < levels.length; i++) {
+			levels[i].setVisible(false);
 		}
 	}
 	

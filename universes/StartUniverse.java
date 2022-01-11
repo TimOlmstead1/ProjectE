@@ -17,8 +17,6 @@ public class StartUniverse implements Universe {
 
 	public StartUniverse () {
 		
-		RangerCharacterSprite.resetUpgrades();
-		
 		this.setXCenter(500);
 		this.setYCenter(350);
 		

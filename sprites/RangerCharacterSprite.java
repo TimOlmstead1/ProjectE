@@ -20,6 +20,8 @@ public class RangerCharacterSprite implements DisplayableSprite, MovableSprite{
 	static int startingHealth = 0;
 	static double xMoveSpeed = 0;
 	
+	static int levelsUnlocked = 1; //value relates to the level number
+	
 	private Universe currentUniverse = null;
 	
 	private boolean isJumping = false;

@@ -1,7 +1,7 @@
 import java.awt.MouseInfo;
 import java.util.ArrayList;
 
-public class LevelSelectUniverse implements ConUniverse {
+public class LevelSelectUniverse implements LvlUniverse {
 
 	private boolean complete = false;	
 	private Background background = null;	
