@@ -1,7 +1,7 @@
 
 public class ShellAnimation implements Animation {
 	
-	private final int TOTAL_UNIVERSES = 6;
+	private final int TOTAL_UNIVERSES = 7;
 
 	private static int universeCount = 0;
 	
@@ -33,7 +33,7 @@ public class ShellAnimation implements Animation {
 			return new ControlsUniverse();
 		}
 		else if (universeCount == 3) {
-			return new EasyUniverse();
+			return new FinalUniverse();
 		}
 		
 		else if (universeCount == 4) {
@@ -44,6 +44,9 @@ public class ShellAnimation implements Animation {
 		}
 		else if (universeCount == 6) {
 			return new LevelSelectUniverse();
+		}
+		else if (universeCount == 7) {
+			return new FinalUniverse();
 		}
 		else {
 			return null;

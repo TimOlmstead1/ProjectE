@@ -35,7 +35,7 @@ public class AnimationFrame extends JFrame {
 	private JLabel[] healthBar = new JLabel[5];
 	private JLabel[] bossBar = new JLabel[10];
 	private JButton[] upgrades = new JButton[3];
-	private JButton[] levels = new JButton[3];
+	private JButton[] levels = new JButton[4];
 	
 	private int lastCheckedBossHealth = 0;
 	private int lastCheckedPlayerHealth = 0;
@@ -195,7 +195,7 @@ public class AnimationFrame extends JFrame {
 				
 				});
 			}
-			else {
+			else if (i == 2){
 				levels[i].addMouseListener(new MouseAdapter() {
 					public void mouseClicked(MouseEvent arg0) {
 						btnLvl3_mouseClicked(arg0);
@@ -204,11 +204,20 @@ public class AnimationFrame extends JFrame {
 				
 				});
 			}
-			levels[i].setBounds(400, (i*75) + 330, 175, 64);  //10 extra pixels of space between the buttons 
+			else {
+				levels[i].addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent arg0) {
+						btnLvl4_mouseClicked(arg0);
+					}
+					
+				
+				});
+			}
+			
+			levels[i].setBounds(400, (i*75) + 300, 175, 64);  //10 extra pixels of space between the buttons 
 			getContentPane().add(levels[i]);
 			getContentPane().setComponentZOrder(levels[i], 0);
 			levels[i].setVisible(false);
-			
 			
 		}
 		
@@ -217,8 +226,7 @@ public class AnimationFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				btnPauseRun_mouseClicked(arg0);
-			}
-			
+			}			
 		
 		});
 		
