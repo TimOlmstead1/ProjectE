@@ -14,7 +14,7 @@ public class ToggleBullet implements EnemyProjectile{
 	private double height = 16;
 	private boolean dispose = false;
 	
-	private final double RESULTANT_VELOCITY_X = 180;
+	private final double RESULTANT_VELOCITY_X = 200;
 	
 	private static Image imageRight = null;
 	private static Image imageLeft = null;

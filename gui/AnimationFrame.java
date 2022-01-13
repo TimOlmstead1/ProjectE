@@ -32,7 +32,7 @@ public class AnimationFrame extends JFrame {
 	private double xpFrameCenter = 0;		
 	private double ypFrameCenter = 0;
 	
-	private JLabel[] healthBar = new JLabel[5];
+	private JLabel[] healthBar = new JLabel[6];
 	private JLabel[] bossBar = new JLabel[10];
 	private JButton[] upgrades = new JButton[3];
 	private JButton[] levels = new JButton[4];

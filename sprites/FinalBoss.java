@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 public class FinalBoss implements EnemySprite, MovableSprite{
 	
 	private final double RESULTANT_VELOCITY = 70;
+	private final double COSMIC_DURATION = 80;
 	
 	private double velocityY = 0;
 	private double velocityX = 0;
@@ -21,19 +22,21 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	private double centerX = 0;
 	private double centerY = 0;
 	
-	private double width = 38;
-	private double height = 48;
+	private double width = 88; //44
+	private double height = 90; //45
 	
 	private boolean dispose = false;
 
-	private Image[] snakeSprites;
+	private Image[] flameSprites;
+	
+	private int bossStage = -1; // Increases to change boss behavior
+	
+	private double floatingAnimationCount = 0;
 	
 	private CollisionDetection collisionDetection;
 	
 	private int health;
 	private boolean beenHit = false;
-	
-	private double floatingAnimationCount = 0;
 	
 	private DisplayableSprite overlappingSprite;
 	
@@ -45,39 +48,25 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	
 	private boolean playerIsToTheRight = false;
 	
-	private EnemyProjectile[] rockShield;
-	private boolean rocksAdded;
-
 	private double timeLastShot = 0;
 	private double timeHit = 0;
-	private boolean angry = false;
-	private boolean cosmic = false;
 	private int cosmicCount = 0;
+	private boolean cosmicShooting = false;
+	private double cosmicAnimation = 0;
 	
 	public FinalBoss(double centerX, double centerY) {
 		this.centerX = centerX;
 		this.centerY = centerY;
 		
-		rockShield = new EnemyProjectile[16];
-		for (int i = 0; i < rockShield.length; i++) {
-			if (i > 7) {
-				rockShield[i] = new PositionRock(8, i-8);
-			}
-			else {
-				rockShield[i] = new PositionRock(4, i);
-			}
-		}
-		rocksAdded = false;
-		
 		collisionDetection = new CollisionDetection();
 		
-		health = 4;
+		health = 9;
 		
 		try {
-			snakeSprites = new Image[12];
-			for (int i = 1; i <= snakeSprites.length; i++) {
-				String path = String.format("res/greenBoss/snakeBoss%d.png", i);
-				snakeSprites[i-1] = ImageIO.read(new File(path));
+			flameSprites = new Image[11];
+			for (int i = 1; i <= flameSprites.length; i++) {
+				String path = String.format("res/FlameBoss/BlueFlameBoss%d.png", i);
+				flameSprites[i-1] = ImageIO.read(new File(path));
 			}
 		}
 		catch (IOException e) {
@@ -86,79 +75,15 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	}
 
 	public Image getImage() {
-		if (deathAnimation == 1) {
-			if (deathAnimationCounter <= 100) {
-				deathAnimationCounter++;
-				return snakeSprites[3];
-			}
-			else if (deathAnimationCounter <= 150) {
-				deathAnimationCounter++;
-				return snakeSprites[8];
-			}
-			else if (deathAnimationCounter <= 200) {
-				deathAnimationCounter++;
-				return snakeSprites[9];
-			}
-			else if (deathAnimationCounter <= 250) {
-				deathAnimationCounter++;
-				return snakeSprites[10];
-			}
-			else if (deathAnimationCounter <= 300) {
-				deathAnimationCounter++;
-				return snakeSprites[11];
+		if (bossStage < 2) {
+			if (playerIsToTheRight) {
+				return flameSprites[10]; 
 			}
 			else {
-				deathAnimation = 2;
+				return flameSprites[4]; 
 			}
 		}
-		else if (deathAnimation == 2) {
-			return snakeSprites[11];
-		}	
-		else if (playerIsToTheRight){
-			if (beenHit) {
-				return snakeSprites[2];
-			}
-			else if (shootingAnimation) {
-				return snakeSprites[1];
-			}
-			else {
-				if (animationCount <= 30) {
-					animationCount++;
-					return snakeSprites[0];
-				}
-				else if (animationCount <= 60){
-					animationCount++;
-					return snakeSprites[3];
-				}
-				else {
-					animationCount = 0;
-					return snakeSprites[0]; 
-				}	
-			}
-		}
-		else {
-			if (beenHit) {
-				return snakeSprites[6];
-			}
-			else if (shootingAnimation) {
-				return snakeSprites[5];
-			}
-			else {
-				if (animationCount <= 30) {
-					animationCount++;
-					return snakeSprites[4];
-				}
-				else if (animationCount <= 60){
-					animationCount++;
-					return snakeSprites[7];
-				}
-				else {
-					animationCount = 0;
-					return snakeSprites[4]; 
-				}
-			}
-		}
-		return snakeSprites[11]; 
+		return flameSprites[10]; 
 	}
 
 	public boolean getVisible() {
@@ -241,44 +166,38 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			deathAnimation = 1;
 			((FightingUniverse) universe).setIsFightStarted(false);
 		}
-		else {
-			
-			if (!(rocksAdded)) {
-				for(int i = 0; i < rockShield.length; i++) {
-					if (!(rockShield[i] == null)) {
-						universe.getSprites().add(rockShield[i]);
-					}
-				}
-				rocksAdded = true;
+		else if (health == 8) {
+			bossStage = 0;
+			if (cosmicAnimation == 0) {
+				cosmicAnimation = timeAlive;
 			}
-			for (int i = 0; i < rockShield.length; i++) {
-				if (!(rockShield[i] == null)) {
-					if (((PositionRock) rockShield[i]).getHealth() <= 2){
-						rockShield[i] = null;
-					}
-				}
-			}
-			
-			if (universe.getPlayer1().getCenterX() > centerX) {
-				playerIsToTheRight = true;
-			}
-			else {
-				playerIsToTheRight = false;
-			}
-			
-			timeAlive = timeAlive + (actual_delta_time*0.01);
-			
-			//
+		}
+		/////
 		
-			if (checkOverlapArrows(universe)) {
-				try {
-					checkPixelCollision(universe, overlappingSprite);
-				}
-				catch(Exception ImageOutOfBoundsException){
-				//actually figured out why this didn't work, the arrows needed to have their own collision detection as well 
-				}
+		if (universe.getPlayer1().getCenterX() > centerX) {
+			playerIsToTheRight = true;
+		}
+		else {
+			playerIsToTheRight = false;
+		}
+		
+		timeAlive = timeAlive + (actual_delta_time*0.01);
+		
+		if (timeHit + 30 <= timeAlive) {
+			beenHit = false;
+		}
+		//
+	
+		if (checkOverlapProjectiles(universe)) {
+			try {
+				checkPixelCollision(universe, overlappingSprite);
 			}
-			
+			catch(Exception ImageOutOfBoundsException){
+			//actually figured out why this didn't work, the arrows needed to have their own collision detection as well 
+			}
+		}
+		
+		if (bossStage < 2) {
 			floatingAnimationCount++;
 			if (floatingAnimationCount <= 20) {
 				centerY = centerY + 0.5;
@@ -289,95 +208,56 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			else {
 				floatingAnimationCount = 0;
 			}
+		}
+		if (bossStage == 0) {
+			if (cosmicAnimation + 5 <= timeAlive) {
+				centerX = -100;
+				centerY = 100;    //puts the boss way off screen
+			}
+			if (health == 8) {
+				if (cosmicAnimation + COSMIC_DURATION <= timeAlive) {
+					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicShot(universe, 2);
+					}
+					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*2 <= timeAlive) {
+					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicShot(universe, 1);
+					}
+					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
+						cosmicShooting = false;
+					}
+				}
+			}
+		}
+		else if (bossStage == 1) {
 			
+		}
+		else if (bossStage == 2) {
+			
+		}
 
-			
-			double travelAngle = (playerAngle(universe));
-			if ((distanceBetweenPlayer(universe) <= 200)&&(distanceBetweenPlayer(universe) > 170)){
-				velocityX = 0;
-				velocityY = 0;
-				
-				double targetX = universe.getPlayer1().getCenterX();
-				double targetY = universe.getPlayer1().getCenterY();	
-				double angleRadians = Math.atan(Math.abs((centerY - targetY)/(centerX - targetX)));
-				
-				if ((targetX > centerX)&&(targetY > centerY)) {
-				}
-				else if ((targetX < centerX)&&(targetY > centerY)) {
-					angleRadians = Math.PI - angleRadians;
-				}
-				else if ((targetX < centerX)&&(targetY < centerY)) {
-					angleRadians = Math.PI + angleRadians;
-				}
-				else {
-					angleRadians = 2*(Math.PI) - angleRadians;
-				}
-				angleRadians = 2*(Math.PI) - angleRadians;
-				velocityX = Math.sin(angleRadians)*(RESULTANT_VELOCITY);
-				velocityY = Math.cos(angleRadians)*(RESULTANT_VELOCITY);
-				
-			}
-			else if (distanceBetweenPlayer(universe) >= 170) {
-				velocityX = Math.cos(travelAngle)*(RESULTANT_VELOCITY);
-				velocityY = Math.sin(travelAngle)*(RESULTANT_VELOCITY);
-			}
-			
-			else {
-				velocityX = Math.cos(travelAngle)*(RESULTANT_VELOCITY)*(-1);
-				velocityY = Math.sin(travelAngle)*(RESULTANT_VELOCITY)*(-1);
-			}
-			
-			double movement_x = (this.velocityX * actual_delta_time * 0.001);
-			double movement_y = (this.velocityY * actual_delta_time * 0.001);
-			    
-			this.centerX += movement_x;
-			this.centerY += movement_y;
-			
-			//
-			if (((cosmic)&&(timeAlive >= timeLastShot + 5)&&(timeAlive >= timeHit + 15))) {
-				beenHit = false;
-				cosmicShot(universe);
-				timeLastShot = timeAlive;
-			}
-			if ((cosmic)&&(timeAlive >= timeHit + 80)){
-				cosmic = false;
-				timeHit = timeAlive;
-				timeLastShot = timeAlive;
-				angry = true;
-			}
-			
-			
-			if (((angry)&&(timeAlive >= timeLastShot + 3)&&(timeAlive >= timeHit + 15))) {
-				beenHit = false;
-				shootingAnimation = true;
-				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 1));
-				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) + Math.PI/48, 1)); // 3.25 degrees more
-				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) - + Math.PI/48, 1)); // same but less
-				timeLastShot = timeAlive;
-			}
-			if ((angry)&&(timeAlive >= timeHit + 65)){
-				angry = false;
-				shootingAnimation = false;
-			}
-			
-			
-			if (timeAlive >= timeLastShot + 57) {
-				shootingAnimation = true;
-			}
-			if (timeAlive >= timeLastShot + 60) {
-				shootingAnimation = false;
-				timeLastShot = timeAlive;
-				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 1));
-			}
+		if (timeAlive >= timeLastShot + 57) {
+			shootingAnimation = true;
+		}
+		if (timeAlive >= timeLastShot + 60) {
+			shootingAnimation = false;
+			timeLastShot = timeAlive;
+			universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 1));
 		}
 	}
 	
-	private boolean checkOverlapArrows(Universe sprites) {
+	private boolean checkOverlapProjectiles(Universe sprites) {
 
 		boolean overlap = false;
 
 		for (DisplayableSprite sprite : sprites.getSprites()) {
-			if (sprite instanceof ArrowSprite) {
+			if ((sprite instanceof ArrowSprite)||(sprite instanceof ToggleBullet)) {
 				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
 					overlap = true;
 					overlappingSprite = sprite;
@@ -389,31 +269,24 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	}	
 	
 	private void checkPixelCollision(Universe universe, DisplayableSprite sprite) {
-		if (sprite instanceof ArrowSprite) {
+		if ((sprite instanceof ArrowSprite)||(sprite instanceof ToggleBullet)) {
 			
 			if (CollisionDetection.pixelBasedOverlaps(this, sprite)){
+				
 				if (!(beenHit)) {
-					((ArrowSprite) sprite).setDispose();
-					health = health - ((Projectile) sprite).getDamageGiven();
-					beenHit = true;
-					timeHit = timeAlive;
-					for(int i = 0; i < rockShield.length; i++) {
-						if (rockShield[i] == null) {
-							if (i > 7) {
-								rockShield[i] = new PositionRock(8, i-8);
-							}
-							else {
-								rockShield[i] = new PositionRock(4, i);
-							}
-							universe.getSprites().add(rockShield[i]);
+					((Projectile) sprite).setDispose();
+					if (sprite instanceof ArrowSprite) {
+						if (bossStage < 2) {
+							health = health - ((Projectile) sprite).getDamageGiven();
+							beenHit = true;
+							timeHit = timeAlive;
 						}
 					}
-					if (health > 1) {
-						angry = true;
-					}
-					else {
-						cosmic = true;
-					}
+					else if (sprite instanceof ToggleBullet){
+						health = health - ((Projectile) sprite).getDamageGiven();
+						beenHit = true;
+						timeHit = timeAlive;
+					}					
 				}
 			}
 		}				
@@ -424,7 +297,7 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	}
 
 	public int getCollisionDamage() {
-		return 1;
+		return 2;
 	}
 	
 	private double playerAngle(Universe universe) { //finds the angle between the player and the boss
@@ -455,18 +328,35 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 		return diagonalDistance;
 	}
 	
-	private void cosmicShot(Universe universe) {
-		if (cosmicCount == 0) {
-			for(int i = 0; i < 20; i++) {
-				universe.getSprites().add(new BloodProjectile(24, 24, 0 + i*(Math.PI/10), 1));
+	private void cosmicShot(Universe universe, int type) {
+		if (type == 1) {
+			if (cosmicCount == 0) {
+				for(int i = 0; i < 20; i++) {
+					universe.getSprites().add(new BloodProjectile(24, 24, 0 + i*(Math.PI/10), 1));
+				}
+				cosmicCount++;
 			}
-			cosmicCount++;
+			else if (cosmicCount == 1) {
+				for(int i = 0; i < 20; i++) {
+					universe.getSprites().add(new BloodProjectile(24, 24, Math.PI/20 + i*(Math.PI/10), 1));
+				}
+				cosmicCount--;
+			}
 		}
-		else if (cosmicCount == 1) {
-			for(int i = 0; i < 20; i++) {
-				universe.getSprites().add(new BloodProjectile(24, 24, Math.PI/20 + i*(Math.PI/10), 1));
+
+		else if (type == 1) {
+			if (cosmicCount == 0) {
+				for(int i = 0; i < 20; i++) {
+					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 59, StandardLevelLayout.TILE_HEIGHT * 47, 0 + i*(Math.PI/10), 1));
+				}
+				cosmicCount++;
 			}
-			cosmicCount--;
+			else if (cosmicCount == 1) {
+				for(int i = 0; i < 20; i++) {
+					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 59, StandardLevelLayout.TILE_HEIGHT * 47, Math.PI/20 + i*(Math.PI/10), 1));
+				}
+				cosmicCount--;
+			}
 		}
 	}
 }
