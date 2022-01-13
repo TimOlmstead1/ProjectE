@@ -124,6 +124,19 @@ public class FinalUniverse implements FightingUniverse {
 			}
 		}
 		
+		boolean readyToReset = false;
+		for (int i = 0; i < boxes.size(); i++) {
+			readyToReset = ((ToggleBox)boxes.get(i)).getActivity();
+			if (!(readyToReset)) {
+				break;
+			}
+		}
+		if (readyToReset) {
+			for (int i = 0; i < boxes.size(); i++) {
+				((ToggleBox)boxes.get(i)).resetActivity();
+			}
+		}
+		
 		for (int i = 0; i < sprites.size(); i++) {
 			DisplayableSprite sprite = sprites.get(i);
 			sprite.update(this, keyboard, mouse, actual_delta_time);

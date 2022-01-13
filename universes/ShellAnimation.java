@@ -33,7 +33,7 @@ public class ShellAnimation implements Animation {
 			return new ControlsUniverse();
 		}
 		else if (universeCount == 3) {
-			return new FinalUniverse();
+			return new EasyUniverse();
 		}
 		
 		else if (universeCount == 4) {
@@ -43,10 +43,10 @@ public class ShellAnimation implements Animation {
 			return new SecondUniverse();
 		}
 		else if (universeCount == 6) {
-			return new LevelSelectUniverse();
+			return new FinalUniverse();
 		}
 		else if (universeCount == 7) {
-			return new FinalUniverse();
+			return new LevelSelectUniverse();
 		}
 		else {
 			return null;

@@ -439,9 +439,10 @@ public class AnimationFrame extends JFrame {
 					}
 					else {
 						for (int i = 0; i < levels.length; i++) {
-							if (RangerCharacterSprite.levelsUnlocked >= i+1) {
-								levels[i].setVisible(true);
-							}
+							levels[i].setVisible(true);
+//							if (RangerCharacterSprite.levelsUnlocked >= i+1) {
+//								levels[i].setVisible(true);
+//							}
 						}
 					}
 				}
@@ -581,7 +582,7 @@ public class AnimationFrame extends JFrame {
 	}
 	
 	protected void btnLevelSelect_mouseClicked(MouseEvent arg0) {
-		animation.setUniverseCount(5);
+		animation.setUniverseCount(6);
 		levelClicked = true;
 		levelOpen = true;
 	}
@@ -636,7 +637,7 @@ public class AnimationFrame extends JFrame {
 	}
 	protected void btnLvl4_mouseClicked(MouseEvent arg0) {
 		levelSelected = true;
-		animation.setUniverseCount(6);
+		animation.setUniverseCount(5);
 		for (int i = 0; i < levels.length; i++) {
 			levels[i].setVisible(false);
 		}

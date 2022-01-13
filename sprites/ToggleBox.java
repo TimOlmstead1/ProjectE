@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class ToggleBox implements DisplayableSprite {
+	
+	static boolean recentlySpawnedBullet = false;
 
 	private static Image activeImage;
 	private static Image unactiveImage;
@@ -102,12 +104,12 @@ public class ToggleBox implements DisplayableSprite {
 	}
 	
 	public void update(Universe universe, KeyboardInput keyboard, MouseInput mouse, long actual_delta_time) {
-			checkOverlap(universe);
+			checkOverlap((FightingUniverse) universe);
 			
 	}
 
 	
-	private boolean checkOverlap(Universe sprites) {
+	private boolean checkOverlap(FightingUniverse sprites) {
 
 		boolean overlap = false;
 
@@ -116,8 +118,21 @@ public class ToggleBox implements DisplayableSprite {
 				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY(), sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
 					overlap = true;
 					((ArrowSprite) sprite).setDispose();
+					if (sprites.getIsFightStarted()) {
+						boolean toTheRight = false;
+						if (sprites.getPlayer1().getCenterX() > centerX) {
+							toTheRight = true;
+						}
+						if ((!(recentlySpawnedBullet))&&(active == false)) {
+							sprites.getSprites().add(new ToggleBullet(centerX, centerY, toTheRight));
+							recentlySpawnedBullet = true;
+						}
+						else {
+							recentlySpawnedBullet = false;
+						}
+					}
 					active = true;
-					break;					
+					break;	
 				}
 			}
 		}		
