@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 public class FinalBoss implements EnemySprite, MovableSprite{
 	
 	private final double RESULTANT_VELOCITY = 70;
-	private final double COSMIC_DURATION = 80;
+	private final double COSMIC_DURATION = 100;
 	
 	private double velocityY = 0;
 	private double velocityX = 0;
@@ -166,7 +166,7 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			deathAnimation = 1;
 			((FightingUniverse) universe).setIsFightStarted(false);
 		}
-		else if (health == 8) {
+		else if ((health < 9)&&(health >= 6)) {
 			bossStage = 0;
 			if (cosmicAnimation == 0) {
 				cosmicAnimation = timeAlive;
@@ -210,26 +210,103 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			}
 		}
 		if (bossStage == 0) {
-			if (cosmicAnimation + 5 <= timeAlive) {
+			if (cosmicAnimation + 5 >= timeAlive) {
 				centerX = -100;
 				centerY = 100;    //puts the boss way off screen
 			}
 			if (health == 8) {
-				if (cosmicAnimation + COSMIC_DURATION <= timeAlive) {
-					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
-						cosmicShooting = true;
-						cosmicShot(universe, 2);
-					}
-					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
-						cosmicShooting = false;
-					}
-				}
-				else if (cosmicAnimation + COSMIC_DURATION*2 <= timeAlive) {
+				if (cosmicAnimation + COSMIC_DURATION >= timeAlive) {
 					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
 						cosmicShooting = true;
 						cosmicShot(universe, 1);
 					}
 					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*2 >= timeAlive) {
+					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicShot(universe, 2);
+					}
+					else if ((timeAlive%5 > 1)&&(timeAlive%5 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*3 >= timeAlive) {
+					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicShot(universe, 3);
+					}
+					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*4 >= timeAlive) {
+					if ((timeAlive%5 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicShot(universe, 4);
+					}
+					else if ((timeAlive%5 > 1)&&(timeAlive%5 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else {
+					cosmicAnimation = 0;
+					cosmicCount = 0;
+					centerX = StandardLevelLayout.TILE_WIDTH * 32;
+					centerY = StandardLevelLayout.TILE_HEIGHT * 47; 
+				}
+			}
+			
+			///////////////////////////////////////////////////////////////////////////////////
+			else if (health == 7) {
+				if (cosmicAnimation == timeAlive) {
+					centerX = -100;
+					centerY = 100;    //puts the boss way off screen
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*0.4 >= timeAlive) {
+					if ((timeAlive%1.1 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicWall(universe, 2);
+					}
+					else if ((timeAlive%1.2 > 1)&&(timeAlive%1.2 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*0.4 + 0.5 >= timeAlive) {
+					cosmicCount = 0;
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*0.8 >= timeAlive) {
+					if ((timeAlive%1.2 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicWall(universe, 1);
+					}
+					else if ((timeAlive%1.2 > 1)&&(timeAlive%1.2 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*0.8 + 0.5 >= timeAlive) {
+					cosmicCount = 0;
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*1.28 >= timeAlive) {
+					if ((timeAlive%1.1 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicWall(universe, 3);
+					}
+					else if ((timeAlive%1.2 > 1)&&(timeAlive%1.2 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else if (cosmicAnimation +  COSMIC_DURATION*1.28 + 0.5>= timeAlive) {
+					cosmicCount = 0;
+				}
+				else if (cosmicAnimation +  COSMIC_DURATION*1.76 >= timeAlive) {
+					if ((timeAlive%1.2 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicWall(universe, 4);
+					}
+					else if ((timeAlive%1.2 > 1)&&(timeAlive%1.2 < 2)){
 						cosmicShooting = false;
 					}
 				}
@@ -332,31 +409,82 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 		if (type == 1) {
 			if (cosmicCount == 0) {
 				for(int i = 0; i < 20; i++) {
-					universe.getSprites().add(new BloodProjectile(24, 24, 0 + i*(Math.PI/10), 1));
+					universe.getSprites().add(new BloodProjectile(24, 25, 0 + i*(Math.PI/10), 1));
 				}
 				cosmicCount++;
 			}
 			else if (cosmicCount == 1) {
 				for(int i = 0; i < 20; i++) {
-					universe.getSprites().add(new BloodProjectile(24, 24, Math.PI/20 + i*(Math.PI/10), 1));
+					universe.getSprites().add(new BloodProjectile(24, 25, Math.PI/20 + i*(Math.PI/10), 1));
 				}
 				cosmicCount--;
 			}
 		}
 
-		else if (type == 1) {
+		else if (type == 2) {
 			if (cosmicCount == 0) {
 				for(int i = 0; i < 20; i++) {
-					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 59, StandardLevelLayout.TILE_HEIGHT * 47, 0 + i*(Math.PI/10), 1));
+					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 61, StandardLevelLayout.TILE_HEIGHT * 49, 0 + i*(Math.PI/10), 1));
 				}
 				cosmicCount++;
 			}
 			else if (cosmicCount == 1) {
 				for(int i = 0; i < 20; i++) {
-					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 59, StandardLevelLayout.TILE_HEIGHT * 47, Math.PI/20 + i*(Math.PI/10), 1));
+					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 61, StandardLevelLayout.TILE_HEIGHT * 49, Math.PI/20 + i*(Math.PI/10), 1));
 				}
 				cosmicCount--;
 			}
+		}
+		else if (type == 3) {
+			if (cosmicCount == 0) {
+				for(int i = 0; i < 20; i++) {
+					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 61, 25, 0 + i*(Math.PI/10), 1));
+				}
+				cosmicCount++;
+			}
+			else if (cosmicCount == 1) {
+				for(int i = 0; i < 20; i++) {
+					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 61, 25, Math.PI/20 + i*(Math.PI/10), 1));
+				}
+				cosmicCount--;
+			}
+		}
+		else if (type == 4) {
+			if (cosmicCount == 0) {
+				for(int i = 0; i < 20; i++) {
+					universe.getSprites().add(new BloodProjectile(24, StandardLevelLayout.TILE_HEIGHT * 49, 0 + i*(Math.PI/10), 1));
+				}
+				cosmicCount++;
+			}
+			else if (cosmicCount == 1) {
+				for(int i = 0; i < 20; i++) {
+					universe.getSprites().add(new BloodProjectile(24, StandardLevelLayout.TILE_HEIGHT * 49, Math.PI/20 + i*(Math.PI/10), 1));
+				}
+				cosmicCount--;
+			}
+		}
+	}
+	
+	private void cosmicWall(Universe universe, int type) {
+		if (type == 1) {
+			universe.getSprites().add(new BloodProjectile(24 + (12*cosmicCount), 25, -3*(Math.PI/2), 1));
+			cosmicCount++;
+		}
+		else if (type == 2) {
+			universe.getSprites().add(new BloodProjectile((StandardLevelLayout.TILE_WIDTH * 61) - (cosmicCount*12), 25, -3*(Math.PI/2), 1));
+			cosmicCount++;
+		}
+		else if (type == 3) {
+			if (!((cosmicCount > 15)&&(cosmicCount < 19))) {
+				universe.getSprites().add(new BloodProjectile((StandardLevelLayout.TILE_WIDTH * 61) - (cosmicCount*12), 25, -3*(Math.PI/2), 1));
+			}
+			cosmicCount++;
+		}
+		else if (type == 4) {
+			if (!((cosmicCount > 22)&&(cosmicCount < 26))) {
+				universe.getSprites().add(new BloodProjectile(24 + (12*cosmicCount), 25, -3*(Math.PI/2), 1));
+			}
+			cosmicCount++;
 		}
 	}
 }
