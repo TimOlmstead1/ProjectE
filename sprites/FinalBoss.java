@@ -52,7 +52,9 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	private double timeHit = 0;
 	private int cosmicCount = 0;
 	private boolean cosmicShooting = false;
+	private boolean cosmicShootingSimul = false;
 	private double cosmicAnimation = 0;
+	private boolean waspSummoned = false;
 	
 	public FinalBoss(double centerX, double centerY) {
 		this.centerX = centerX;
@@ -166,12 +168,6 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			deathAnimation = 1;
 			((FightingUniverse) universe).setIsFightStarted(false);
 		}
-		else if ((health < 9)&&(health >= 6)) {
-			bossStage = 0;
-			if (cosmicAnimation == 0) {
-				cosmicAnimation = timeAlive;
-			}
-		}
 		/////
 		
 		if (universe.getPlayer1().getCenterX() > centerX) {
@@ -183,7 +179,27 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 		
 		timeAlive = timeAlive + (actual_delta_time*0.01);
 		
-		if (timeHit + 30 <= timeAlive) {
+		if ((health < 9)&&(health >= 7)) {
+			bossStage = 0;
+			if (beenHit) {
+				cosmicAnimation = timeAlive;
+				cosmicCount = 0;
+				centerX = -100;
+				centerY = 100; 
+				beenHit = false;
+			}
+		}
+		else if ((health < 7)&&(health > 4)) {
+			bossStage = 1;
+			if (beenHit) {
+				waspSummoned = false;
+				centerX = -100;
+				centerY = 100; 
+				beenHit = false;
+			}
+		}
+		
+		if (timeHit + 15 <= timeAlive) {
 			beenHit = false;
 		}
 		//
@@ -210,12 +226,12 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			}
 		}
 		if (bossStage == 0) {
-			if (cosmicAnimation + 5 >= timeAlive) {
-				centerX = -100;
-				centerY = 100;    //puts the boss way off screen
-			}
 			if (health == 8) {
-				if (cosmicAnimation + COSMIC_DURATION >= timeAlive) {
+				if (cosmicAnimation + 5 >= timeAlive) {
+					centerX = -100;
+					centerY = 100;    //puts the boss way off screen
+				}
+				else if (cosmicAnimation + COSMIC_DURATION >= timeAlive) {
 					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
 						cosmicShooting = true;
 						cosmicShot(universe, 1);
@@ -229,16 +245,16 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 						cosmicShooting = true;
 						cosmicShot(universe, 2);
 					}
-					else if ((timeAlive%5 > 1)&&(timeAlive%5 < 2)){
+					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
 						cosmicShooting = false;
 					}
 				}
 				else if (cosmicAnimation + COSMIC_DURATION*3 >= timeAlive) {
-					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
+					if ((timeAlive%5 < 1)&&(!(cosmicShooting))) {
 						cosmicShooting = true;
 						cosmicShot(universe, 3);
 					}
-					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
+					else if ((timeAlive%5 > 1)&&(timeAlive%5 < 2)){
 						cosmicShooting = false;
 					}
 				}
@@ -251,9 +267,7 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 						cosmicShooting = false;
 					}
 				}
-				else {
-					cosmicAnimation = 0;
-					cosmicCount = 0;
+				else{
 					centerX = StandardLevelLayout.TILE_WIDTH * 32;
 					centerY = StandardLevelLayout.TILE_HEIGHT * 47; 
 				}
@@ -261,7 +275,7 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			
 			///////////////////////////////////////////////////////////////////////////////////
 			else if (health == 7) {
-				if (cosmicAnimation == timeAlive) {
+				if (cosmicAnimation + 0.05 >= timeAlive) {
 					centerX = -100;
 					centerY = 100;    //puts the boss way off screen
 				}
@@ -292,29 +306,92 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 				else if (cosmicAnimation + COSMIC_DURATION*1.28 >= timeAlive) {
 					if ((timeAlive%1.1 < 1)&&(!(cosmicShooting))) {
 						cosmicShooting = true;
+						cosmicWall(universe, 4);
+						cosmicCount--;
 						cosmicWall(universe, 3);
 					}
 					else if ((timeAlive%1.2 > 1)&&(timeAlive%1.2 < 2)){
 						cosmicShooting = false;
 					}
 				}
-				else if (cosmicAnimation +  COSMIC_DURATION*1.28 + 0.5>= timeAlive) {
+				else if (cosmicAnimation +  COSMIC_DURATION*1.28 + 0.5 >= timeAlive) {
 					cosmicCount = 0;
+					cosmicShooting = false;
 				}
-				else if (cosmicAnimation +  COSMIC_DURATION*1.76 >= timeAlive) {
+				else if (cosmicAnimation + COSMIC_DURATION*1.76 >= timeAlive) {
 					if ((timeAlive%1.2 < 1)&&(!(cosmicShooting))) {
 						cosmicShooting = true;
-						cosmicWall(universe, 4);
+						cosmicWall(universe, 5);
+						cosmicCount--;
+						cosmicWall(universe, 6);
 					}
 					else if ((timeAlive%1.2 > 1)&&(timeAlive%1.2 < 2)){
 						cosmicShooting = false;
 					}
 				}
+				else if (cosmicAnimation +  COSMIC_DURATION*1.76 + 0.5 >= timeAlive) {
+					cosmicCount = 0;
+					cosmicShooting = false;
+				}
+				else if (cosmicAnimation + COSMIC_DURATION*2.16 >= timeAlive) {
+					if ((timeAlive%1.2 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						cosmicWall(universe, 2);
+					}
+					else if ((timeAlive%1.2 > 1)&&(timeAlive%1.2 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else{
+					centerX = StandardLevelLayout.TILE_WIDTH * 32;
+					centerY = StandardLevelLayout.TILE_HEIGHT * 47; 
+				}
 			}
 		}
+		////////////////////////////////////////////////////////////////////////////
 		else if (bossStage == 1) {
-			
+			if (health == 6) {
+				if (!(waspSummoned)) {
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 4, StandardLevelLayout.TILE_HEIGHT * 4));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 4, StandardLevelLayout.TILE_HEIGHT * 48));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 48));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 4));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 30, StandardLevelLayout.TILE_HEIGHT * 48));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 30, StandardLevelLayout.TILE_HEIGHT * 4));
+					waspSummoned = true;
+				}
+				if (checkForWasp(universe)) {
+					centerX = -100;
+					centerY = 100;    //puts the boss way off screen
+				}
+				else {
+					centerX = StandardLevelLayout.TILE_WIDTH * 32;
+					centerY = StandardLevelLayout.TILE_HEIGHT * 5; 
+				}
+			}
+			else if (health == 5) {
+				if (!(waspSummoned)) {
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 4, StandardLevelLayout.TILE_HEIGHT * 4));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 4, StandardLevelLayout.TILE_HEIGHT * 48));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 48));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 4));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 30, StandardLevelLayout.TILE_HEIGHT * 48));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 30, StandardLevelLayout.TILE_HEIGHT * 4));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 22));
+					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 22));
+					waspSummoned = true;
+				}
+				if (checkForWasp(universe)) {
+					centerX = -100;
+					centerY = 100;    //puts the boss way off screen
+				}
+				else {
+					centerX = StandardLevelLayout.TILE_WIDTH * 32;
+					centerY = StandardLevelLayout.TILE_HEIGHT * 5; 
+				}
+			}
 		}
+		///////////////////////////////////////////////////////////////////////////
 		else if (bossStage == 2) {
 			
 		}
@@ -463,6 +540,20 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 				cosmicCount--;
 			}
 		}
+		else if (type == 5) {
+			if (cosmicCount == 0) {
+				for(int i = 0; i < 30; i++) {
+					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 30, 25, 0 + i*(Math.PI/15), 1));
+				}
+				cosmicCount++;
+			}
+			else if (cosmicCount == 1) {
+				for(int i = 0; i < 30; i++) {
+					universe.getSprites().add(new BloodProjectile(StandardLevelLayout.TILE_WIDTH * 30, 25, Math.PI/30 + i*(Math.PI/15), 1));
+				}
+				cosmicCount--;
+			}
+		}
 	}
 	
 	private void cosmicWall(Universe universe, int type) {
@@ -481,10 +572,34 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			cosmicCount++;
 		}
 		else if (type == 4) {
+			if (!((cosmicCount > 30)&&(cosmicCount < 34))) {
+				universe.getSprites().add(new BloodProjectile(24 + (12*cosmicCount), 25, -3*(Math.PI/2), 1));
+			}
+			cosmicCount++;
+		}
+		else if (type == 5) {
+			if (!((cosmicCount > 11)&&(cosmicCount < 15))) {
+				universe.getSprites().add(new BloodProjectile((StandardLevelLayout.TILE_WIDTH * 61) - (cosmicCount*12), 25, -3*(Math.PI/2), 1));
+			}
+			cosmicCount++;
+		}
+		else if (type == 6) {
 			if (!((cosmicCount > 22)&&(cosmicCount < 26))) {
 				universe.getSprites().add(new BloodProjectile(24 + (12*cosmicCount), 25, -3*(Math.PI/2), 1));
 			}
 			cosmicCount++;
 		}
+	}
+	private boolean checkForWasp(Universe universe) {
+
+		boolean copyFound = false;
+
+		for (DisplayableSprite sprite : universe.getSprites()) {
+			if (sprite instanceof WaspEnemy) {
+				copyFound = true;
+				break;
+			}
+		}
+		return copyFound;
 	}
 }
