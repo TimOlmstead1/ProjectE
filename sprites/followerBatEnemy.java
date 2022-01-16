@@ -191,13 +191,13 @@ public class followerBatEnemy implements EnemySprite, MovableSprite{
 			
 			DisplayableSprite sprite = universe.getSprites().get(i);
 			
-			if ((sprite instanceof ArrowSprite)) {
+			if ((sprite instanceof ArrowSprite)||(sprite instanceof ToggleBullet)) {
 				
 				if (CollisionDetection.pixelBasedOverlaps(this, sprite)){
 					
-					if (sprite instanceof ArrowSprite) {
+					if ((sprite instanceof ArrowSprite)||(sprite instanceof ToggleBullet)) {
 						health = health - ((Projectile) sprite).getDamageGiven();
-						((ArrowSprite) sprite).setDispose();
+						((Projectile) sprite).setDispose();
 					}
 					break;		
 				}

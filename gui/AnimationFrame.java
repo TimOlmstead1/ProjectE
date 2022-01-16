@@ -439,10 +439,9 @@ public class AnimationFrame extends JFrame {
 					}
 					else {
 						for (int i = 0; i < levels.length; i++) {
-							levels[i].setVisible(true);
-//							if (RangerCharacterSprite.levelsUnlocked >= i+1) {
-//								levels[i].setVisible(true);
-//							}
+							if (RangerCharacterSprite.levelsUnlocked >= i+1) {
+								levels[i].setVisible(true);
+							}
 						}
 					}
 				}

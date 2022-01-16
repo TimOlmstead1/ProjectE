@@ -6,12 +6,18 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+
 import javax.imageio.ImageIO;
 
 public class FinalBoss implements EnemySprite, MovableSprite{
-	
-	private final double RESULTANT_VELOCITY = 70;
+
 	private final double COSMIC_DURATION = 100;
+	private final double ACCCELERATION_Y = 600; 
+	private final double CHARGE_SPEED = 220;
+	private final double INITIAL_JUMP_VELOCITY = 320; 
+	private final double MOVE_SPEED = 300;
+	private final double FRICTION_FACTOR_X = 0.90; 
 	
 	private double velocityY = 0;
 	private double velocityX = 0;
@@ -22,8 +28,8 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	private double centerX = 0;
 	private double centerY = 0;
 	
-	private double width = 88; //44
-	private double height = 90; //45
+	private double width = 68; //44
+	private double height = 70; //45
 	
 	private boolean dispose = false;
 
@@ -34,6 +40,7 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	private double floatingAnimationCount = 0;
 	
 	private CollisionDetection collisionDetection;
+	TwoDimensionBounce bounce;
 	
 	private int health;
 	private boolean beenHit = false;
@@ -42,7 +49,6 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	
 	private double timeAlive = 0;
 	
-	private boolean shootingAnimation = false;
 	private int deathAnimation = 0; //0 is not started, 1 is started, and 2 is complete
 	private double deathAnimationCounter = 0;
 	
@@ -52,20 +58,41 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	private double timeHit = 0;
 	private int cosmicCount = 0;
 	private boolean cosmicShooting = false;
-	private boolean cosmicShootingSimul = false;
 	private double cosmicAnimation = 0;
 	private boolean waspSummoned = false;
+	
+	private boolean startedSpawning = false;
+	private boolean spawnAnimation = false;
+	private boolean charging = false;
+	private boolean jumping = false;
+	private boolean jumped = false;
+	private boolean dropping = false;
+	private boolean dropped = false;
+	private boolean invulnrable = false;
+	private boolean chargedRight = false;
+	private double timeStartedAction = 0;
+	private double timeBetweenMoves = 45;
+	
+	private boolean flameCone;
+	private boolean attacking = false;
+	private double timeAttackStarted = 0;
+	private boolean fireUpwards = false;
+	private double vulnrableClock = 0;
+	
 	
 	public FinalBoss(double centerX, double centerY) {
 		this.centerX = centerX;
 		this.centerY = centerY;
 		
 		collisionDetection = new CollisionDetection();
+		bounce = new TwoDimensionBounce();
+		collisionDetection.setBounceFactorX(0);
+		collisionDetection.setBounceFactorY(0);
 		
 		health = 9;
 		
 		try {
-			flameSprites = new Image[11];
+			flameSprites = new Image[18];
 			for (int i = 1; i <= flameSprites.length; i++) {
 				String path = String.format("res/FlameBoss/BlueFlameBoss%d.png", i);
 				flameSprites[i-1] = ImageIO.read(new File(path));
@@ -77,7 +104,35 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	}
 
 	public Image getImage() {
-		if (bossStage < 2) {
+		if (deathAnimation == 1) {
+			if (deathAnimationCounter <= 80) {
+				deathAnimationCounter++;
+				return flameSprites[14];
+			}
+			else if (deathAnimationCounter <= 160) {
+				deathAnimationCounter++;
+				return flameSprites[5];
+			}
+			else if (deathAnimationCounter <= 320) {
+				deathAnimationCounter++;
+				return flameSprites[15];
+			}
+			else if (deathAnimationCounter <= 480) {
+				deathAnimationCounter++;
+				return flameSprites[16];
+			}
+			else if (deathAnimationCounter <= 880) {
+				deathAnimationCounter++;
+				return flameSprites[17];
+			}
+			else {
+				deathAnimation = 2;
+			}
+		}
+		else if (deathAnimation == 2) {
+			return flameSprites[17];
+		}
+		else if (bossStage < 2) {
 			if (playerIsToTheRight) {
 				return flameSprites[10]; 
 			}
@@ -85,7 +140,66 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 				return flameSprites[4]; 
 			}
 		}
-		return flameSprites[10]; 
+		else if (bossStage == 2) {
+			if (spawnAnimation) {
+				if (animationCount <= 400) {
+					animationCount++;
+					return flameSprites[5];
+				}
+				else if (animationCount <= 600) {
+					animationCount++;
+					return flameSprites[11];
+				}
+				else if (animationCount <= 800) {
+					animationCount++;
+					return flameSprites[1];
+				}
+				else {
+					spawnAnimation = false;
+				}
+			}
+			else if (!(invulnrable)) {
+				if (playerIsToTheRight) {
+					return flameSprites[13]; 
+				}
+				else {
+					return flameSprites[12]; 
+				}
+			}
+			else if (charging){
+				if (chargedRight) {
+					return flameSprites[9]; 
+				}
+				else {
+					return flameSprites[3]; 
+				}
+			}
+			else if (jumping) {
+				if (playerIsToTheRight) {
+					return flameSprites[6]; 
+				}
+				else {
+					return flameSprites[0]; 
+				}
+			}
+			else if (dropping){
+				if (playerIsToTheRight) {
+					return flameSprites[8]; 
+				}
+				else {
+					return flameSprites[2]; 
+				}
+			}
+			else {
+				if (playerIsToTheRight) {
+					return flameSprites[7]; 
+				}
+				else {
+					return flameSprites[1]; 
+				}
+			}
+		}
+		return flameSprites[0];
 	}
 
 	public boolean getVisible() {
@@ -198,8 +312,19 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 				beenHit = false;
 			}
 		}
+		else if ((health <= 4)&&(health > 0)) {
+			bossStage = 2;
+			if (!(startedSpawning)) {
+				vulnrableClock = timeAlive;
+				spawnAnimation = true;
+				invulnrable = true;
+				startedSpawning = true;
+				centerX = StandardLevelLayout.TILE_WIDTH * 32;
+				centerY = StandardLevelLayout.TILE_HEIGHT * 30; 
+			}
+		}
 		
-		if (timeHit + 15 <= timeAlive) {
+		if (timeHit + 20 <= timeAlive) {
 			beenHit = false;
 		}
 		//
@@ -354,8 +479,6 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 				if (!(waspSummoned)) {
 					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 4, StandardLevelLayout.TILE_HEIGHT * 4));
 					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 4, StandardLevelLayout.TILE_HEIGHT * 48));
-					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 48));
-					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 4));
 					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 30, StandardLevelLayout.TILE_HEIGHT * 48));
 					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 30, StandardLevelLayout.TILE_HEIGHT * 4));
 					waspSummoned = true;
@@ -377,8 +500,6 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 4));
 					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 30, StandardLevelLayout.TILE_HEIGHT * 48));
 					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 30, StandardLevelLayout.TILE_HEIGHT * 4));
-					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 22));
-					universe.getSprites().add(new WaspEnemy(StandardLevelLayout.TILE_WIDTH * 60, StandardLevelLayout.TILE_HEIGHT * 22));
 					waspSummoned = true;
 				}
 				if (checkForWasp(universe)) {
@@ -392,15 +513,129 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			}
 		}
 		///////////////////////////////////////////////////////////////////////////
+		
 		else if (bossStage == 2) {
+			//
 			
+			boolean onGround = isOnGround(universe);
+			
+			if ((onGround)&&(jumping)&&(!(jumped))) {
+				this.velocityY -= INITIAL_JUMP_VELOCITY;
+				if (playerIsToTheRight) {
+					this.velocityX = MOVE_SPEED;
+				}
+				else {
+					this.velocityX = -MOVE_SPEED;
+				}
+				checkWall(universe, "BarrierSprite");
+				onGround = false;
+				jumped = true;
+			}
+			if ((onGround)&&(dropping)&&(!(dropped))) {
+				this.velocityY = INITIAL_JUMP_VELOCITY;
+				onGround = false;
+				dropped = true;
+			}
+			if ((universe.getPlayer1().getCenterY() <= centerY+45)&&(universe.getPlayer1().getCenterY() >= centerY-45)) {
+				dropping = false;
+			}
+			
+			if (velocityY < 0) {
+				collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
+			}
+			else if(velocityY >= 0) {
+				if (dropping){
+					collisionDetection.calculate2DBounce(bounce, this, universe.getBarriers(), velocityX, velocityY, actual_delta_time);
+				}
+				else {
+					collisionDetection.calculate2DBounce(bounce, this, universe.getOneWayBarriers(), velocityX, velocityY, actual_delta_time);
+				}
+			}
+			this.centerY = bounce.newY + (height / 2);
+			this.velocityY = bounce.newVelocityY;
+
+			if (onGround == true) {
+				this.velocityY = 0;
+			} else {
+				this.velocityY = this.velocityY + ACCCELERATION_Y * 0.001 * actual_delta_time;
+			}
+			onGround = isOnGround(universe);
+			
+			if (charging) {
+				if (chargedRight) {
+					this.velocityX = CHARGE_SPEED;
+				}
+				else {
+					this.velocityX = -CHARGE_SPEED;
+				}
+				checkWall(universe, "BarrierSprite");
+			}
+			
+			this.velocityX = this.velocityX * FRICTION_FACTOR_X;
+			double movement_x = (velocityX * actual_delta_time * 0.001);
+
+			
+			this.centerX += movement_x;
+
+			
+			//
+			if (vulnrableClock + 210 <= timeAlive) {
+				invulnrable = false;
+				jumping = false;
+				charging = false;
+				attacking = false;
+				dropping = false;
+				if (vulnrableClock + 375  <= timeAlive) {
+					vulnrableClock = timeAlive;
+					invulnrable = true;
+				}
+			}
+			if (invulnrable) {
+			
+				if (!(spawnAnimation)) {
+					if (timeAlive >= timeStartedAction + timeBetweenMoves) {
+						timeStartedAction = timeAlive;
+						move((FightingUniverse) universe);
+					}
+				}
+				if (flameCone) {
+					if (timeAttackStarted + 30 <= timeAlive) {
+						flameCone = false;
+						attacking = false;
+					}
+					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 1));
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) + Math.PI/48, 1)); // 3.25 degrees more
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) - + Math.PI/48, 1)); // same but less
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) + Math.PI/24, 1)); 
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe) - + Math.PI/24, 1)); 
+					}
+					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
+						cosmicShooting = false;
+					}
+				}
+				else if (fireUpwards) {
+					if (timeAttackStarted + 30 <= timeAlive) {
+						fireUpwards = false;
+						attacking = false;
+					}
+					if ((timeAlive%6 < 1)&&(!(cosmicShooting))) {
+						cosmicShooting = true;
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, Math.PI/2 + Math.PI, 1));
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, Math.PI/2 + Math.PI + Math.PI/24, 1)); 
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, Math.PI/2 + Math.PI - + Math.PI/24, 1));
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, Math.PI/2 + Math.PI + Math.PI/12, 1)); // 3.25 degrees more
+						universe.getSprites().add(new BloodProjectile(centerX, centerY, Math.PI/2 + Math.PI - + Math.PI/12, 1)); // same but less
+					}
+					else if ((timeAlive%6 > 1)&&(timeAlive%6 < 2)){
+						cosmicShooting = false;
+					}
+				}
+			}
 		}
 
-		if (timeAlive >= timeLastShot + 57) {
-			shootingAnimation = true;
-		}
-		if (timeAlive >= timeLastShot + 60) {
-			shootingAnimation = false;
+		if (timeAlive >= timeLastShot + 40) {
 			timeLastShot = timeAlive;
 			universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 1));
 		}
@@ -437,9 +672,15 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 						}
 					}
 					else if (sprite instanceof ToggleBullet){
-						health = health - ((Projectile) sprite).getDamageGiven();
-						beenHit = true;
-						timeHit = timeAlive;
+						if (!(invulnrable)) {
+							if (bossStage == 2) {
+								timeBetweenMoves = timeBetweenMoves - 5;
+							}
+							health = health - ((Projectile) sprite).getDamageGiven();
+							beenHit = true;
+							invulnrable = true;
+							timeHit = timeAlive;
+						}
 					}					
 				}
 			}
@@ -451,7 +692,12 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 	}
 
 	public int getCollisionDamage() {
-		return 2;
+		if (spawnAnimation) {
+			return 0;
+		}
+		else {
+			return 1;
+		}
 	}
 	
 	private double playerAngle(Universe universe) { //finds the angle between the player and the boss
@@ -601,5 +847,122 @@ public class FinalBoss implements EnemySprite, MovableSprite{
 			}
 		}
 		return copyFound;
+	}
+	
+	private boolean isOnGround(Universe universe) {
+		boolean onGround = false;
+		for (DisplayableSprite sprite: universe.getSprites()) {
+			boolean bottomColiding = this.getMaxY() >= (sprite.getMinY()) && this.getMaxY() <= sprite.getMinY();
+			boolean withinRange = this.getMaxX() > sprite.getMinX() && this.getMinX() < sprite.getMaxX();
+			if (bottomColiding && withinRange) {
+				onGround = true;
+				break;
+			}
+		}
+		return onGround;
+	}
+	private void move(FightingUniverse universe) {
+		double playerX = universe.getPlayer1().getCenterX();
+		double playerY = universe.getPlayer1().getCenterY();
+		charging = false;
+		jumping = false;
+		dropping = false;
+		
+		if ((!(charging))&&(!(attacking))) {
+			if ((playerY <= centerY+45)&&(playerY >= centerY-45)) {
+				charging = true;
+				chargedRight = playerIsToTheRight;	
+				
+			}
+			else if (playerY < centerY + 46) {
+				jumping = true;
+				jumped = false;
+			}
+			else if (playerY > centerY - 46) {
+				dropping = true;
+				dropped = false;
+			}
+			attack(universe);
+		}
+	}
+	private boolean checkWall(Universe sprites, String targetSprite) {
+
+		boolean overlap = false;
+
+		for (DisplayableSprite sprite : sprites.getSprites()) {
+			if (sprite.getClass().toString().contains(targetSprite)) {
+				if (CollisionDetection.overlaps(this.getMinX(), this.getMinY() + 2, this.getMaxX(), this.getMaxY() - 2, sprite.getMinX(),sprite.getMinY(), sprite.getMaxX(), sprite.getMaxY())) {
+					if (targetSprite.equals("BarrierSprite")) {
+						if (velocityX > 0) {
+							centerX = centerX - 5;
+						}
+						else {
+							centerX = centerX + 5;
+						}
+						stop();
+						charging = false;
+					}
+					overlap = true;
+					break;					
+				}
+			}
+		}		
+		return overlap;		
+	}
+	private void attack(FightingUniverse universe) {
+		timeAttackStarted = timeAlive;
+		attacking = true;
+		if (distanceBetweenPlayer(universe) >= 250) {
+			int attack = ThreadLocalRandom.current().nextInt(0, 3 + 1);
+			if (attack == 0) {
+				flameCone = true;
+			}
+			if (attack == 1) {
+				attacking = false;
+				move(universe);
+			}
+			else if ((attack == 2)&&(!(checkForWasp(universe)))) {
+				universe.getSprites().add(new WaspEnemy(centerX, centerY));
+				attacking = false;
+			}
+			else if ((attack ==2)||(attack == 3)) {
+				fireInCircle(universe);
+				attacking = false;
+			}
+		}
+		else{
+			int attack = ThreadLocalRandom.current().nextInt(0, 2 + 1);
+			if (attack == 0) {
+				int random = (int) ((Math.random() * (2 - 1)) + 1);
+				if (!(random == 1)) {
+					universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 1));
+				}
+				if (!(random == 2)) {
+					universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 2, StandardLevelLayout.TILE_HEIGHT * 48));
+				}
+				if (!(random == 1)) {
+					universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 48));
+				}
+				if (!(random == 2)) {
+					universe.getSprites().add(new followerBatEnemy(StandardLevelLayout.TILE_WIDTH * 62, StandardLevelLayout.TILE_HEIGHT * 1));
+				}
+				attacking = false;
+			}
+			else if ((attack == 1)&&(universe.getPlayer1().getCenterY() < centerY + 46)) {
+				fireUpwards = true;
+			}
+			else{
+				universe.getSprites().add(new BloodProjectile(centerX, centerY, playerAngle(universe), 1));
+				universe.getSprites().add(new followerBatEnemy(centerX, centerY));
+				attacking = false;
+			}
+		}
+		
+	}
+	
+	private void fireInCircle(Universe universe) {
+		for (int i = 0; i < 24; i++) {
+			universe.getSprites().add(new BloodProjectile(centerX, centerY, 0 + i*(Math.PI/12), 1));
+		}
 	}
 }

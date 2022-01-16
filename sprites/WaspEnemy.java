@@ -266,7 +266,7 @@ public class WaspEnemy implements EnemySprite, MovableSprite{
 	}
 
 	public int getCollisionDamage() {
-		return 1;
+		return 0;
 	}
 private double playerAngle(Universe universe) { //finds the angle between the player and the boss
 		
